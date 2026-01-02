@@ -48,6 +48,7 @@ La struttura segue un approccio **Microservices-Ready** implementato come Monoli
 <p align="center">
   <img src="./docs/images/schema.png" width="700" alt="Schema Architettura Aegis">
 </p>
+
 ### Componenti Funzionali
 * **Frontend (`aegis-frontend`):** SPA in **React + Vite**. Gestisce UI, cifratura client-side e interazioni REST.
 * **Backend (`aegis-backend`):** Resource Server in **Java 21 / Spring Boot 3**. Gestisce logica business, crittografia file, accesso dati e audit.
