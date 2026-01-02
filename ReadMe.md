@@ -129,7 +129,7 @@ Il sistema gestisce la gerarchia e l'accesso ai dati su tre livelli di segretezz
 
 ## 6. Approfondimento: Flusso OIDC
 
-[cite_start]Il flusso **OIDC (OpenID Connect)** delega l'autenticazione a Keycloak, che rilascia un token di autorizzazione all'applicazione richiedente.
+Il flusso **OIDC (OpenID Connect)** delega l'autenticazione a Keycloak, che rilascia un token di autorizzazione all'applicazione richiedente.
 
 1.  **Richiesta:** Il client richiede accesso.
 2.  **Concessione:** L'utente si autentica (MFA) su Keycloak.
