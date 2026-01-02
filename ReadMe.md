@@ -118,7 +118,6 @@ Il flusso **OIDC (OpenID Connect)** delega l'autenticazione a Keycloak, che rila
 5.  **Verifica:** Il backend valida crittograficamente firma (JWK), scadenza (`exp`) ed emittente (`iss`) prima di servire la risorsa.
 
 ---
----
 
 ## 5. Modello Operativo e Ruoli
 
