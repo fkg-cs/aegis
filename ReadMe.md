@@ -34,7 +34,7 @@ Aegis implementa controlli a più livelli per mitigare le minacce moderne:
 | **Man-in-the-Middle** | **TLS/HTTPS Forzato**: Backend su porta 8443, Database via JDBC SSL, Keycloak su HTTPS. |
 | **Information Disclosure** | **Exception Masking**: Il *GlobalExceptionHandler* sopprime stack trace rivelatori, restituendo messaggi generici. |
 
-### Protocolli Crittografici
+### Protocolli crittografici utilizzati
 * **Data in Transit:** Backend forza HTTPS (Porta 8443, Keystore PKCS12). Connessione DB via JDBC SSL (`sslmode=require`).
 * **Data at Rest:** File allegati cifrati con **AES-128** previa verifica integrità (**SHA-256**).
 * **Hashing Password:** Gestito da Keycloak tramite standard **PBKDF2/Argon2**.
@@ -42,7 +42,6 @@ Aegis implementa controlli a più livelli per mitigare le minacce moderne:
 ---
 
 ## 3. Architettura del Progetto
-### Schema Architetturale
 <p align="center">
   <img src="./docs/images/schema.png" width="700" alt="Schema Architettura Aegis">
 </p>
@@ -100,7 +99,7 @@ AEGIS/
 
 | Componente | Tecnologia | Ruolo |
 | :--- | :--- | :--- |
-| **Backend** | Java 21, Spring Boot 3 | [cite_start]Resource Server, Business Logic |
+| **Backend** | Java 21, Spring Boot 3 | Resource Server, Business Logic |
 | **Frontend** | React, Vite | Interfaccia Utente SPA  |
 | **Auth** | OIDC, OAuth 2.0, JWT | Standard di Protocollo |
 | **IAM** | Keycloak | Identity Provider, MFA, RBAC  |
