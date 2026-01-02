@@ -7,7 +7,7 @@
 
 ## 1. Panoramica del Progetto
 
-**Aegis** è un sistema informativo progettato per contesti governativi e parastatali, operando su un modello **"Security First"**. La piattaforma offre un framework per la gestione di missioni e personale, adottando un'architettura moderna a microservizi dockerizzati orchestrata per garantire resilienza e isolamento.
+**Aegis** è un sistema informativo web progettato per contesti governativi e parastatali, operando su un modello **"Security First"**. La piattaforma offre un framework per la gestione di missioni e personale, adottando un'architettura moderna a microservizi dockerizzati orchestrata per garantire resilienza e isolamento.
 
 ---
 
@@ -35,7 +35,7 @@ Aegis implementa controlli a più livelli per mitigare le minacce moderne:
 | **Information Disclosure** | **Exception Masking**: Il *GlobalExceptionHandler* sopprime stack trace rivelatori, restituendo messaggi generici. |
 
 ### Protocolli crittografici utilizzati
-* **Data in Transit:** Backend forza HTTPS (Porta 8443, Keystore PKCS12). Connessione DB via JDBC SSL (`sslmode=require`).
+* **Data in Transit:** Backend utilizza HTTPS (Porta 8443, Keystore PKCS12). Connessione DB via JDBC SSL (`sslmode=require`).
 * **Data at Rest:** File allegati cifrati con **AES-128** previa verifica integrità (**SHA-256**).
 * **Hashing Password:** Gestito da Keycloak tramite standard **PBKDF2/Argon2**.
 
@@ -107,6 +107,17 @@ AEGIS/
 | **Security** | HashiCorp Vault | Gestione Segreti  |
 | **Crittografia** | AES-128, SHA-256 | Cifratura Dati e Integrità  |
 
+### Approfondimento: Flusso OIDC
+
+Il flusso **OIDC (OpenID Connect)** delega l'autenticazione a Keycloak, che rilascia un token di autorizzazione all'applicazione richiedente.
+
+1.  **Richiesta:** Il client richiede accesso.
+2.  **Concessione:** L'utente si autentica (MFA) su Keycloak.
+3.  **Token:** Keycloak emette un *Access Token* (JWT).
+4.  **Accesso:** Il client allega il token nell'header `Authorization: Bearer`.
+5.  **Verifica:** Il backend valida crittograficamente firma (JWK), scadenza (`exp`) ed emittente (`iss`) prima di servire la risorsa.
+
+---
 ---
 
 ## 5. Modello Operativo e Ruoli
@@ -124,19 +135,11 @@ Il sistema gestisce la gerarchia e l'accesso ai dati su tre livelli di segretezz
 
 ---
 
-## 6. Approfondimento: Flusso OIDC
+## 7. Test d'uso
 
-Il flusso **OIDC (OpenID Connect)** delega l'autenticazione a Keycloak, che rilascia un token di autorizzazione all'applicazione richiedente.
+## 8. Test d'abuso
 
-1.  **Richiesta:** Il client richiede accesso.
-2.  **Concessione:** L'utente si autentica (MFA) su Keycloak.
-3.  **Token:** Keycloak emette un *Access Token* (JWT).
-4.  **Accesso:** Il client allega il token nell'header `Authorization: Bearer`.
-5.  **Verifica:** Il backend valida crittograficamente firma (JWK), scadenza (`exp`) ed emittente (`iss`) prima di servire la risorsa.
-
----
-
-## 7. Guida all'Installazione (Docker Environment)
+## 9. Guida all'Installazione (Docker Environment)
 
 **Prerequisiti:** Docker Desktop, Java 21, Node.js 20+.
 
