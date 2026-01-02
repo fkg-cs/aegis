@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------
+  # DATABASE: PostgreSQL (SSL ENFORCED)
+  # ----------------------------------------------------------------
+  aegis-db:
+    image: postgres:16-alpine
+    container_name: aegis-db
+    user: root
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password_segreta_dev
+      POSTGRES_DB: aegis_core
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:Z 
+      - ./postgres-ssl/server.crt:/tmp/server.crt:ro
+      - ./postgres-ssl/server.key:/tmp/server.key:ro
+    networks:
+      - aegis-net
+    command: >
+      sh -c "cp /tmp/server.crt /var/lib/postgresql/server.crt && 
+             cp /tmp/server.key /var/lib/postgresql/server.key && 
+             chown postgres:postgres /var/lib/postgresql/server.crt /var/lib/postgresql/server.key && 
+             chmod 600 /var/lib/postgresql/server.key && 
+             exec docker-entrypoint.sh postgres -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key"
+
+  # ----------------------------------------------------------------
+  # IDENTITY PROVIDER: Keycloak (HTTPS ENABLED)
+  # ----------------------------------------------------------------
+  aegis-idp:
+    image: quay.io/keycloak/keycloak:22.0
+    container_name: aegis-idp
+    command: start-dev --import-realm --http-port=8080 --https-port=8443
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://aegis-db:5432/keycloak
+      KC_DB_USERNAME: admin
+      KC_DB_PASSWORD: password_segreta_dev
+      KC_DB_URL_PROPERTIES: "?ssl=true&sslmode=no-verify"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: localhost
+      # UPDATE: Puntiamo ai file montati dalla cartella specifica per Keycloak
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/server.crt
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/server.key
+    ports:
+      - "8080:8080" # HTTP (Interno)
+      - "8444:8443" # HTTPS (Esterno)
+    depends_on:
+      - aegis-db
+    volumes:
+      - ./themes/aegis:/opt/keycloak/themes/aegis
+      - ./realm-export.json:/opt/keycloak/data/import/realm.json
+      # UPDATE: Montiamo la cartella con i permessi corretti (User 1000)
+      - ./keycloak-ssl/server.crt:/opt/keycloak/conf/server.crt:ro
+      - ./keycloak-ssl/server.key:/opt/keycloak/conf/server.key:ro
+    networks:
+      - aegis-net
+
+  # ----------------------------------------------------------------
+  # SECRET MANAGEMENT: HashiCorp Vault
+  # ----------------------------------------------------------------
+  aegis-vault:
+    image: hashicorp/vault:1.15
+    container_name: aegis-vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root_token_segreto
+      VAULT_ADDR: 'http://0.0.0.0:8200'
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - aegis-net
+
+volumes:
+  postgres_data:
+
+networks:
+  aegis-net:
+    driver: bridge

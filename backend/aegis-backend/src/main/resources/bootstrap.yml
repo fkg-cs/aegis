@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: aegis-backend
+  cloud:
+    vault:
+      host: localhost
+      port: 8200
+      scheme: http
+      authentication: TOKEN
+      token: ${VAULT_TOKEN}
+      fail-fast: true
+      kv:
+        enabled: true
+        backend: secret
+        application-name: aegis-backend

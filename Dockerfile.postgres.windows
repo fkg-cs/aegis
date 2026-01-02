@@ -1,0 +1,11 @@
+FROM postgres:16-alpine
+
+# Copia i certificati all'interno dell'immagine
+COPY postgres-ssl/server.key /var/lib/postgresql/server.key
+COPY postgres-ssl/server.crt /var/lib/postgresql/server.crt
+
+# Imposta i permessi corretti (UID 70 = postgres in Alpine)
+# Questo risolve il problema "private key file must be owned by the database user"
+RUN chown 70:70 /var/lib/postgresql/server.key \
+    && chmod 600 /var/lib/postgresql/server.key \
+    && chown 70:70 /var/lib/postgresql/server.crt

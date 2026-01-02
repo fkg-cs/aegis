@@ -1,0 +1,12 @@
+# .gitattributes
+# Forza l'uso di LF (stile Linux) per tutti i file di testo nel repository remoto
+* text=auto
+
+# Questi file DEVONO restare LF anche su Windows, altrimenti Docker si rompe
+*.sh text eol=lf
+*.bash text eol=lf
+mvnw text eol=lf
+mvnw.cmd text eol=crlf
+Dockerfile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf

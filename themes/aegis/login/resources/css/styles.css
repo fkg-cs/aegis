@@ -1,0 +1,176 @@
+/* --- FONTS & RESET --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
+
+:root {
+    --gov-bg: #0f172a;       /* Blu Notte Profondo */
+    --gov-card: rgba(30, 41, 59, 0.7); /* Vetro scuro */
+    --gov-accent: #38bdf8;   /* Ciano Sky Blue (Leggibile) */
+    --gov-border: rgba(148, 163, 184, 0.2);
+    --gov-text: #f8fafc;     /* Bianco quasi puro */
+    --gov-text-dim: #94a3b8; /* Grigio chiaro */
+    --gov-btn: #0ea5e9;      /* Blu Elettrico */
+}
+
+body {
+    background-color: var(--gov-bg);
+    font-family: 'Inter', sans-serif; /* Font pulito e moderno */
+    color: var(--gov-text);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin: 0;
+    font-size: 16px;
+}
+
+/* --- SFONDO TATTICO --- */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* Mappa mondo stilizzata o griglia sottile */
+    background-image: 
+        linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)),
+        repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(56, 189, 248, 0.05) 50px),
+        repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(56, 189, 248, 0.05) 50px);
+    background-size: cover, 50px 50px, 50px 50px;
+    z-index: -1;
+}
+
+/* --- CARD DI LOGIN (VETRO SMERIGLIATO) --- */
+.pf-c-login__main-body {
+    background-color: var(--gov-card) !important;
+    backdrop-filter: blur(12px); /* Effetto vetro */
+    -webkit-backdrop-filter: blur(12px);
+    
+    border: 1px solid var(--gov-border);
+    border-top: 4px solid var(--gov-accent); /* Barra superiore colorata */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    
+    border-radius: 4px !important;
+    padding: 60px 50px !important;
+    width: 450px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Header della card (Simil-Software Governativo) */
+.pf-c-login__main-body::after {
+    content: "SECURE ACCESS // CLEARANCE REQ";
+    position: absolute;
+    top: 15px; right: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65em;
+    color: var(--gov-text-dim);
+    letter-spacing: 0.1em;
+}
+
+/* --- TITOLO --- */
+#kc-header-wrapper {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--gov-text);
+    letter-spacing: 0.25em;
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* Sottotitolo */
+#kc-header-wrapper::after {
+    content: "DEPARTMENT OF INTELLIGENCE";
+    display: block;
+    font-size: 0.35em;
+    color: var(--gov-accent);
+    letter-spacing: 0.5em;
+    margin-top: 5px;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+/* --- ETICHETTE (User/Pass) --- */
+.pf-c-form__label-text {
+    color: var(--gov-text-dim) !important;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    font-size: 0.75em;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* --- CAMPI INPUT (MASSIMA LEGGIBILITÀ) --- */
+.pf-c-form-control {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--gov-border) !important;
+    color: white !important; /* Testo bianco puro */
+    border-radius: 4px !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem !important;
+    padding: 12px 16px !important;
+    transition: all 0.2s ease;
+}
+
+.pf-c-form-control:focus {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    border-color: var(--gov-accent) !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); /* Glow azzurro leggero */
+    outline: none;
+}
+
+/* --- BOTTONE LOGIN --- */
+#kc-login {
+    background-color: var(--gov-btn) !important;
+    border: none !important;
+    color: white !important;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    font-size: 0.9em;
+    border-radius: 4px !important;
+    padding: 14px !important;
+    margin-top: 30px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+#kc-login:hover {
+    background-color: #0284c7 !important; /* Blu leggermente più scuro */
+    transform: translateY(-1px);
+}
+
+/* --- LINK & PULIZIA --- */
+.pf-c-login__footer, #kc-page-title, .pf-c-login__header { 
+    display: none !important; 
+}
+
+a {
+    color: var(--gov-text-dim) !important;
+    text-decoration: none;
+    font-size: 0.85em;
+    margin-top: 20px;
+    display: inline-block;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: var(--gov-accent) !important;
+    text-decoration: underline;
+}
+
+/* Logo "Classified" in basso */
+body::after {
+    content: "UNAUTHORIZED ACCESS IS PROHIBITED BY LAW";
+    position: absolute;
+    bottom: 20px;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.7em;
+    letter-spacing: 0.2em;
+    font-family: 'JetBrains Mono', monospace;
+    pointer-events: none;
+}

@@ -1,0 +1,77 @@
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: classpath:aegis-keystore.p12
+    key-store-password: passwordsegreta
+    key-store-type: PKCS12
+    key-alias: aegis
+
+spring:
+  application:
+    name: aegis-backend
+
+  # --- 1. CONFIGURAZIONE VAULT ---
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      authentication: TOKEN
+      token: root_token_segreto
+      kv:
+        enabled: true
+        backend: secret
+
+  # --- 2. CONFIGURAZIONE DATABASE (CON SSL ATTIVO) ---
+  datasource:
+    # UPDATE: Aggiunti parametri per forzare SSL e accettare il certificato self-signed
+    url: jdbc:postgresql://localhost:5432/aegis_core?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory
+    driver-class-name: org.postgresql.Driver
+    # Spring chiederà a Vault i valori per queste due variabili
+    username: ${username}
+    password: ${password}
+
+  # --- 3. JPA / HIBERNATE ---
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # --- 4. SECURITY (Keycloak HTTPS Hybrid Config) ---
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # VALIDAZIONE (Stringa): Deve coincidere con il token emesso dal Frontend (HTTPS)
+          issuer-uri: https://localhost:8444/realms/Aegis-Intel
+
+          # CONNESSIONE (Rete): Scarica le chiavi via HTTP per evitare errori di certificato Java
+          jwk-set-uri: http://localhost:8080/realms/Aegis-Intel/protocol/openid-connect/certs
+
+  # --- 5. UPLOAD LIMITS ---
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+# --- 6. RATE LIMITING (DISABILITATO QUI) ---
+# Usiamo la logica Java custom (RateLimitingService.java), quindi questo resta spento.
+bucket4j:
+  enabled: false
+  filters:
+    - cache-name: rate-limit-bucket
+      url: /api/.*
+      strategy: first
+      http-response-body: "{ \"message\": \"Too many requests\" }"
+      rate-limits:
+        - bandwidths:
+            - capacity: 1000
+              time: 1
+              unit: minutes
+
+logging:
+  level:
+    org.springframework.cloud.vault: INFO
+    org.springframework.web: INFO

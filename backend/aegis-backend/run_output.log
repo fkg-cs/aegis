@@ -1,0 +1,313 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.0)
+
+2025-12-29T15:44:14.536+01:00  INFO 32220 --- [aegis-backend] [           main] b.c.PropertySourceBootstrapConfiguration : Located property source: [BootstrapPropertySource {name='bootstrapProperties-secret/aegis-backend'}, BootstrapPropertySource {name='bootstrapProperties-secret/application'}]
+2025-12-29T15:44:14.556+01:00  INFO 32220 --- [aegis-backend] [           main] c.aegis.backend.AegisBackendApplication  : No active profile set, falling back to 1 default profile: "default"
+2025-12-29T15:44:14.577+01:00  INFO 32220 --- [aegis-backend] [           main] o.s.v.c.e.LeaseAwareVaultPropertySource  : Vault location [secret/application] not resolvable: Not found
+2025-12-29T15:44:15.391+01:00  INFO 32220 --- [aegis-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-12-29T15:44:15.444+01:00  INFO 32220 --- [aegis-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 42 ms. Found 4 JPA repository interfaces.
+2025-12-29T15:44:15.794+01:00  INFO 32220 --- [aegis-backend] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=621778ca-0691-3be3-988b-41616b14b34b
+2025-12-29T15:44:16.564+01:00  INFO 32220 --- [aegis-backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8443 (https)
+2025-12-29T15:44:16.596+01:00  INFO 32220 --- [aegis-backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-12-29T15:44:16.596+01:00  INFO 32220 --- [aegis-backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.14]
+2025-12-29T15:44:16.648+01:00  INFO 32220 --- [aegis-backend] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2069 ms
+2025-12-29T15:44:17.225+01:00  INFO 32220 --- [aegis-backend] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-12-29T15:44:17.285+01:00  INFO 32220 --- [aegis-backend] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 7.1.8.Final
+2025-12-29T15:44:17.783+01:00  INFO 32220 --- [aegis-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-12-29T15:44:17.822+01:00  INFO 32220 --- [aegis-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-12-29T15:44:18.126+01:00  INFO 32220 --- [aegis-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2898c70d
+2025-12-29T15:44:18.129+01:00  INFO 32220 --- [aegis-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-12-29T15:44:18.165+01:00  WARN 32220 --- [aegis-backend] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-12-29T15:44:18.195+01:00  INFO 32220 --- [aegis-backend] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/aegis_core?sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 16.11
+	Default catalog/schema: aegis_core/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DatasourceConnectionProviderImpl
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-12-29T15:44:19.192+01:00  INFO 32220 --- [aegis-backend] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-12-29T15:44:19.277+01:00  INFO 32220 --- [aegis-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-12-29T15:44:19.407+01:00  INFO 32220 --- [aegis-backend] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-12-29T15:44:19.739+01:00  WARN 32220 --- [aegis-backend] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-12-29T15:44:20.662+01:00  INFO 32220 --- [aegis-backend] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2025-12-29T15:44:20.792+01:00  INFO 32220 --- [aegis-backend] [           main] o.a.t.util.net.NioEndpoint.certificate   : Connector [https-jsse-nio-8443], TLS virtual host [_default_], certificate type [UNDEFINED] configured from keystore [/home/opx/.keystore] using alias [aegis] with trust store [null]
+2025-12-29T15:44:20.811+01:00  INFO 32220 --- [aegis-backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8443 (https) with context path '/'
+2025-12-29T15:44:20.824+01:00  INFO 32220 --- [aegis-backend] [           main] c.aegis.backend.AegisBackendApplication  : Started AegisBackendApplication in 7.815 seconds (process running for 8.156)
+2025-12-29T15:44:59.842+01:00  INFO 32220 --- [aegis-backend] [nio-8443-exec-9] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-29T15:44:59.842+01:00  INFO 32220 --- [aegis-backend] [nio-8443-exec-9] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-12-29T15:44:59.843+01:00  INFO 32220 --- [aegis-backend] [nio-8443-exec-9] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+
+--- 🕵️‍♂️ DIAGNOSTICA TOKEN PER: agent-smith ---
+
+--- 🕵️‍♂️ DIAGNOSTICA TOKEN PER: agent-smith ---
+   ➤ sub: 40beadca-88e2-4a33-a5c1-1c4c36857d52
+   ➤ sub: 40beadca-88e2-4a33-a5c1-1c4c36857d52
+   ➤ resource_access: {account={roles=[manage-account, manage-account-links, view-profile]}}
+   ➤ resource_access: {account={roles=[manage-account, manage-account-links, view-profile]}}
+   ➤ allowed-origins: [, *]
+   ➤ allowed-origins: [, *]
+   ➤ clearance_level: 3
+   ➤ clearance_level: 3
+   ➤ iss: https://localhost:8444/realms/Aegis-Intel
+   ➤ iss: https://localhost:8444/realms/Aegis-Intel
+   ➤ typ: Bearer
+   ➤ typ: Bearer
+   ➤ preferred_username: agent-smith
+   ➤ preferred_username: agent-smith
+   ➤ office: Room 104
+   ➤ office: Room 104
+   ➤ code_name: Falco
+   ➤ code_name: Falco
+   ➤ sid: f15e6b97-2daf-4a6c-b60a-4bc0d57b51c9
+   ➤ sid: f15e6b97-2daf-4a6c-b60a-4bc0d57b51c9
+   ➤ acr: 1
+   ➤ acr: 1
+   ➤ realm_access: {roles=[offline_access, SUPERVISOR, uma_authorization, default-roles-aegis-intel]}
+   ➤ realm_access: {roles=[offline_access, SUPERVISOR, uma_authorization, default-roles-aegis-intel]}
+   ➤ azp: aegis-frontend
+   ➤ azp: aegis-frontend
+   ➤ auth_time: 1767019827
+   ➤ auth_time: 1767019827
+   ➤ scope: openid profile email
+   ➤ scope: openid profile email
+   ➤ exp: 2025-12-29T14:55:27Z
+   ➤ exp: 2025-12-29T14:55:27Z
+   ➤ session_state: f15e6b97-2daf-4a6c-b60a-4bc0d57b51c9
+   ➤ session_state: f15e6b97-2daf-4a6c-b60a-4bc0d57b51c9
+   ➤ department: Zeta Team
+   ➤ department: Zeta Team
+   ➤ iat: 2025-12-29T14:50:27Z
+   ➤ iat: 2025-12-29T14:50:27Z
+   ➤ jti: 373511b6-0413-403d-a9e8-5867f108b5e0
+   ➤ jti: 373511b6-0413-403d-a9e8-5867f108b5e0
+   ➤ email: smith@aegis.gov
+   ➤ email: smith@aegis.gov
+   ➤ email_verified: false
+   ➤ email_verified: false
+   ➤ given_name: Will
+   ➤ given_name: Will
+   ➤ nonce: caa7df64-8fbf-465b-8158-d3b51d399ea8
+   ➤ nonce: caa7df64-8fbf-465b-8158-d3b51d399ea8
+   ➤ aud: [account]
+   ➤ aud: [account]
+   ➤ full_name: Will Smith
+   ➤ full_name: Will Smith
+   ➤ phone: +39 555 555 55 55
+   ➤ phone: +39 555 555 55 55
+   ➤ name: Will Smith
+   ➤ name: Will Smith
+   ➤ family_name: Smith
+   ➤ family_name: Smith
+   ➤ matricola: 0070001
+   ➤ matricola: 0070001
+   🎯 VALORE GREZZO clearance_level: 3 (Tipo: Long)
+   🎯 VALORE GREZZO clearance_level: 3 (Tipo: Long)
+   ✅ Clearance parsata con successo: 3
+   ✅ Clearance parsata con successo: 3
+
+--- 🕵️‍♂️ DIAGNOSTICA TOKEN PER: kikko ---
+   ➤ sub: 36c674b2-d1f5-4358-979d-105ec27e3d51
+   ➤ resource_access: {account={roles=[manage-account, manage-account-links, view-profile]}}
+   ➤ allowed-origins: [, *]
+   ➤ clearance_level: 4
+   ➤ iss: https://localhost:8444/realms/Aegis-Intel
+   ➤ typ: Bearer
+   ➤ preferred_username: kikko
+   ➤ code_name: FKG
+   ➤ sid: 2f6fcb3b-9445-4971-b92f-9a31257af01d
+   ➤ acr: 1
+   ➤ realm_access: {roles=[SUPER_SUPERVISOR, offline_access, uma_authorization, default-roles-aegis-intel]}
+   ➤ azp: aegis-frontend
+   ➤ auth_time: 1767019860
+   ➤ scope: openid profile email
+   ➤ exp: 2025-12-29T14:56:01Z
+   ➤ session_state: 2f6fcb3b-9445-4971-b92f-9a31257af01d
+   ➤ iat: 2025-12-29T14:51:01Z
+   ➤ jti: 4c8d885a-47e8-4f53-8805-06fbba3722c2
+   ➤ email: kikko@aegis.gov
+   ➤ email_verified: false
+   ➤ given_name: Cimi
+   ➤ nonce: c16c2f85-b72d-43d0-8e8e-861b91dfae7b
+   ➤ aud: [account]
+   ➤ name: Cimi Tero
+   ➤ family_name: Tero
+   ➤ matricola: 000001
+   🎯 VALORE GREZZO clearance_level: 4 (Tipo: Long)
+   ✅ Clearance parsata con successo: 4
+
+--- 🕵️‍♂️ DIAGNOSTICA TOKEN PER: kikko ---
+   ➤ sub: 36c674b2-d1f5-4358-979d-105ec27e3d51
+   ➤ resource_access: {account={roles=[manage-account, manage-account-links, view-profile]}}
+   ➤ allowed-origins: [, *]
+   ➤ clearance_level: 4
+   ➤ iss: https://localhost:8444/realms/Aegis-Intel
+   ➤ typ: Bearer
+   ➤ preferred_username: kikko
+   ➤ code_name: FKG
+   ➤ sid: 2f6fcb3b-9445-4971-b92f-9a31257af01d
+   ➤ acr: 1
+   ➤ realm_access: {roles=[SUPER_SUPERVISOR, offline_access, uma_authorization, default-roles-aegis-intel]}
+   ➤ azp: aegis-frontend
+   ➤ auth_time: 1767019860
+   ➤ scope: openid profile email
+   ➤ exp: 2025-12-29T14:56:01Z
+   ➤ session_state: 2f6fcb3b-9445-4971-b92f-9a31257af01d
+   ➤ iat: 2025-12-29T14:51:01Z
+   ➤ jti: 4c8d885a-47e8-4f53-8805-06fbba3722c2
+   ➤ email: kikko@aegis.gov
+   ➤ email_verified: false
+   ➤ given_name: Cimi
+   ➤ nonce: c16c2f85-b72d-43d0-8e8e-861b91dfae7b
+   ➤ aud: [account]
+   ➤ name: Cimi Tero
+   ➤ family_name: Tero
+   ➤ matricola: 000001
+   🎯 VALORE GREZZO clearance_level: 4 (Tipo: Long)
+   ✅ Clearance parsata con successo: 4
+>>> DEBUG PERMESSI UTENTE: kikko | RUOLI: [ROLE_SUPER_SUPERVISOR, ROLE_offline_access, ROLE_uma_authorization, ROLE_default-roles-aegis-intel]
+
+--- 🕵️‍♂️ DIAGNOSTICA TOKEN PER: analyst-doe ---
+   ➤ sub: 3f8f1ff9-e2cb-400b-a45f-a96be0796869
+   ➤ resource_access: {account={roles=[manage-account, manage-account-links, view-profile]}}
+   ➤ allowed-origins: [, *]
+   ➤ clearance_level: 1
+   ➤ iss: https://localhost:8444/realms/Aegis-Intel
+   ➤ typ: Bearer
+   ➤ preferred_username: analyst-doe
+   ➤ office: Room 101
+   ➤ code_name: Recluta
+   ➤ sid: e58f517e-1170-438f-acfa-fd28cb5dc4d5
+   ➤ acr: 1
+   ➤ realm_access: {roles=[AGENT, offline_access, uma_authorization, default-roles-aegis-intel]}
+   ➤ azp: aegis-frontend
+   ➤ auth_time: 1767019935
+   ➤ scope: openid profile email
+   ➤ exp: 2025-12-29T14:57:15Z
+   ➤ session_state: e58f517e-1170-438f-acfa-fd28cb5dc4d5
+   ➤ department: Alpha Team
+   ➤ iat: 2025-12-29T14:52:15Z
+   ➤ jti: 31cddeeb-b03f-415e-92bc-9a16efa31803
+   ➤ email: doe@aegis.gov
+   ➤ email_verified: false
+   ➤ given_name: John
+   ➤ nonce: 900ff374-6893-450b-b2bb-18de273f3741
+   ➤ aud: [account]
+   ➤ full_name: John Doe
+   ➤ phone: +39 333 333 33 33
+   ➤ name: John Doe
+   ➤ family_name: Doe
+   ➤ matricola: 1010101
+   🎯 VALORE GREZZO clearance_level: 1 (Tipo: Long)
+   ✅ Clearance parsata con successo: 1
+
+--- 🕵️‍♂️ DIAGNOSTICA TOKEN PER: analyst-doe ---
+   ➤ sub: 3f8f1ff9-e2cb-400b-a45f-a96be0796869
+   ➤ resource_access: {account={roles=[manage-account, manage-account-links, view-profile]}}
+   ➤ allowed-origins: [, *]
+   ➤ clearance_level: 1
+   ➤ iss: https://localhost:8444/realms/Aegis-Intel
+   ➤ typ: Bearer
+   ➤ preferred_username: analyst-doe
+   ➤ office: Room 101
+   ➤ code_name: Recluta
+   ➤ sid: e58f517e-1170-438f-acfa-fd28cb5dc4d5
+   ➤ acr: 1
+   ➤ realm_access: {roles=[AGENT, offline_access, uma_authorization, default-roles-aegis-intel]}
+   ➤ azp: aegis-frontend
+   ➤ auth_time: 1767019935
+   ➤ scope: openid profile email
+   ➤ exp: 2025-12-29T14:57:15Z
+   ➤ session_state: e58f517e-1170-438f-acfa-fd28cb5dc4d5
+   ➤ department: Alpha Team
+   ➤ iat: 2025-12-29T14:52:15Z
+   ➤ jti: 31cddeeb-b03f-415e-92bc-9a16efa31803
+   ➤ email: doe@aegis.gov
+   ➤ email_verified: false
+   ➤ given_name: John
+   ➤ nonce: 900ff374-6893-450b-b2bb-18de273f3741
+   ➤ aud: [account]
+   ➤ full_name: John Doe
+   ➤ phone: +39 333 333 33 33
+   ➤ name: John Doe
+   ➤ family_name: Doe
+   ➤ matricola: 1010101
+   🎯 VALORE GREZZO clearance_level: 1 (Tipo: Long)
+   ✅ Clearance parsata con successo: 1
+
+--- 🕵️‍♂️ DIAGNOSTICA TOKEN PER: kikko ---
+   ➤ sub: 36c674b2-d1f5-4358-979d-105ec27e3d51
+   ➤ resource_access: {account={roles=[manage-account, manage-account-links, view-profile]}}
+   ➤ allowed-origins: [, *]
+   ➤ clearance_level: 4
+   ➤ iss: https://localhost:8444/realms/Aegis-Intel
+   ➤ typ: Bearer
+   ➤ preferred_username: kikko
+   ➤ code_name: FKG
+   ➤ sid: 8e4ba878-85db-444e-ab16-3d7341eb583e
+   ➤ acr: 1
+   ➤ realm_access: {roles=[SUPER_SUPERVISOR, offline_access, uma_authorization, default-roles-aegis-intel]}
+   ➤ azp: aegis-frontend
+   ➤ auth_time: 1767019961
+   ➤ scope: openid profile email
+   ➤ exp: 2025-12-29T14:57:41Z
+   ➤ session_state: 8e4ba878-85db-444e-ab16-3d7341eb583e
+   ➤ iat: 2025-12-29T14:52:41Z
+   ➤ jti: 4f594311-1b85-4ce8-b559-78ab7df915a9
+   ➤ email: kikko@aegis.gov
+   ➤ email_verified: false
+   ➤ given_name: Cimi
+   ➤ nonce: bee84f18-1669-4251-8f56-2ae1567842b6
+   ➤ aud: [account]
+   ➤ name: Cimi Tero
+   ➤ family_name: Tero
+   ➤ matricola: 000001
+
+--- 🕵️‍♂️ DIAGNOSTICA TOKEN PER: kikko ---
+   🎯 VALORE GREZZO clearance_level: 4 (Tipo: Long)
+   ➤ sub: 36c674b2-d1f5-4358-979d-105ec27e3d51
+   ✅ Clearance parsata con successo: 4
+   ➤ resource_access: {account={roles=[manage-account, manage-account-links, view-profile]}}
+   ➤ allowed-origins: [, *]
+   ➤ clearance_level: 4
+   ➤ iss: https://localhost:8444/realms/Aegis-Intel
+   ➤ typ: Bearer
+   ➤ preferred_username: kikko
+   ➤ code_name: FKG
+   ➤ sid: 8e4ba878-85db-444e-ab16-3d7341eb583e
+   ➤ acr: 1
+   ➤ realm_access: {roles=[SUPER_SUPERVISOR, offline_access, uma_authorization, default-roles-aegis-intel]}
+   ➤ azp: aegis-frontend
+   ➤ auth_time: 1767019961
+   ➤ scope: openid profile email
+   ➤ exp: 2025-12-29T14:57:41Z
+   ➤ session_state: 8e4ba878-85db-444e-ab16-3d7341eb583e
+   ➤ iat: 2025-12-29T14:52:41Z
+   ➤ jti: 4f594311-1b85-4ce8-b559-78ab7df915a9
+   ➤ email: kikko@aegis.gov
+   ➤ email_verified: false
+   ➤ given_name: Cimi
+   ➤ nonce: bee84f18-1669-4251-8f56-2ae1567842b6
+   ➤ aud: [account]
+   ➤ name: Cimi Tero
+   ➤ family_name: Tero
+   ➤ matricola: 000001
+   🎯 VALORE GREZZO clearance_level: 4 (Tipo: Long)
+   ✅ Clearance parsata con successo: 4
+2025-12-29T15:53:49.669+01:00  INFO 32220 --- [aegis-backend] [nio-8443-exec-3] AUDIT_LOG                                : EVENT=ACCESS_GRANTED | USER=analyst-doe | RESOURCE_ID=6c94aebc-508f-4833-b5ff-3c47d7233525 | ROLE=ASSIGNED_AGENT
+2025-12-29T15:53:54.442+01:00  INFO 32220 --- [aegis-backend] [nio-8443-exec-8] AUDIT_LOG                                : EVENT=ACCESS_GRANTED | USER=analyst-doe | RESOURCE_ID=6c94aebc-508f-4833-b5ff-3c47d7233525 | ROLE=ASSIGNED_AGENT
+2025-12-29T15:53:56.723+01:00  INFO 32220 --- [aegis-backend] [nio-8443-exec-4] AUDIT_LOG                                : EVENT=ACCESS_GRANTED | USER=analyst-doe | RESOURCE_ID=6c94aebc-508f-4833-b5ff-3c47d7233525 | ROLE=ASSIGNED_AGENT
+2025-12-29T15:53:58.207+01:00  INFO 32220 --- [aegis-backend] [nio-8443-exec-6] AUDIT_LOG                                : EVENT=ACCESS_GRANTED | USER=analyst-doe | RESOURCE_ID=6c94aebc-508f-4833-b5ff-3c47d7233525 | ROLE=ASSIGNED_AGENT
+2025-12-29T15:53:59.755+01:00  INFO 32220 --- [aegis-backend] [io-8443-exec-10] AUDIT_LOG                                : EVENT=ACCESS_GRANTED | USER=analyst-doe | RESOURCE_ID=6c94aebc-508f-4833-b5ff-3c47d7233525 | ROLE=ASSIGNED_AGENT
+2025-12-29T15:54:04.877+01:00  INFO 32220 --- [aegis-backend] [nio-8443-exec-9] AUDIT_LOG                                : EVENT=ACCESS_GRANTED | USER=analyst-doe | RESOURCE_ID=6c94aebc-508f-4833-b5ff-3c47d7233525 | ROLE=ASSIGNED_AGENT
