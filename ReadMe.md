@@ -42,8 +42,6 @@ Aegis implementa controlli a più livelli per mitigare le minacce moderne:
 ---
 
 ## 3. Architettura del Progetto
-
-La struttura segue un approccio **Microservices-Ready** implementato come Monolite Modulare per ridurre la complessità operativa in fase di sviluppo, mantenendo i servizi infrastrutturali isolati in container.
 ### Schema Architetturale
 <p align="center">
   <img src="./docs/images/schema.png" width="700" alt="Schema Architettura Aegis">
