@@ -21,9 +21,26 @@ Lo sviluppo ha seguito la metodologia **Shift Left**, integrando la *Security by
 Questa sezione descrive come Aegis traduce i vincoli normativi e istituzionali in regole di gestione del sistema.
 
 ### 2.1 Anagrafe Centralizzata e Verifica NOS
-A differenza dei sistemi commerciali, Aegis inibisce strutturalmente l'autoregistrazione.
-* **Delega all'Autorità:** L'accreditamento del personale (Agenti e Supervisori) è demandato esclusivamente a un'autorità garante terza (es. *PCM* o *DIS*).
-* **Verifica delle Credenziali:** Le identità digitali vengono rilasciate solo a fronte di un valido *Nulla Osta di Sicurezza* (NOS), eliminando alla radice il rischio di utenze non verificate o "fantasma".
+A differenza dei sistemi commerciali, Aegis inibisce strutturalmente l'autoregistrazione. La gestione tecnica delle identità e delle credenziali è centralizzata sull'Identity Provider **Keycloak**, ma il provisioning degli utenti segue un rigido protocollo *out-of-band*:
+
+* **Delega all'Autorità:** L'inserimento dell'anagrafica in Keycloak è demandato esclusivamente agli operatori dell'autorità garante (es. *PCM* o *DIS*). Non esiste alcuna interfaccia pubblica di "Sign Up".
+* **Workflow di Accreditamento:** Le credenziali vengono generate e consegnate all'operatore solo *dopo* l'ottenimento formale del **Nulla Osta di Sicurezza (NOS)**.
+* **Livelli di Clearance (0-3):** Su Keycloak, ad ogni utente viene associato un attributo di livello gerarchico (da `Level 0` - *Sospeso/Nullo* a `Level 3` - *Massimo*), che determina matematicamente l'accesso alle risorse secondo il modello Bell-LaPadula.
+
+#### Classifiche di Segretezza Gestite
+Il sistema mappa i livelli numerici sulle quattro classifiche di segretezza ufficiali (DPCM 6/11/2015):
+
+* **Livello 0 - NOS Sospeso/Inattivo:**
+    Stato di *default* o di sospensione cautelare. L'utente può autenticarsi ma **non ha accesso** a nessuna risorsa operativa (Read/Write Deny su tutto).
+    
+* **Livello 1 - RISERVATO (R) / RISERVATISSIMO (RR):**
+    Abilita l'accesso a informazioni la cui rivelazione non autorizzata può causare un danno lieve o un pregiudizio alla sicurezza nazionale (es. dispacci amministrativi, logistica di base).
+    
+* **Livello 2 - SEGRETO (S):**
+    Accesso elevato per informazioni la cui diffusione non autorizzata può recare **grave danno** all'integrità dello Stato o alla difesa nazionale.
+    
+* **Livello 3 - SEGRETISSIMO (SS):**
+    Livello apicale (*Top Secret*). Riservato a un ristretto numero di Supervisori e agenti per informazioni la cui rivelazione può causare un danno **eccezionalmente grave**, minacciando la sopravvivenza stessa delle istituzioni democratiche.
 
 ### 2.2 Architettura dei Dati "Dual-Layer"
 Il progetto adotta una strategia di gestione dati a doppio livello per bilanciare la segretezza operativa (*Need-to-Know*) con il dovere di controllo democratico:
@@ -57,29 +74,31 @@ Inoltre, i servizi infrastrutturali (Database, Vault) sono isolati in container 
 
 ---
 
-### Matrice di Sicurezza & Defense in Depth
-Aegis implementa controlli a più livelli per mitigare le minacce moderne:
-
+### 4.Matrice di Sicurezza & Defense in Depth
+Aegis implementa una strategia di difesa a più livelli "Defense in Depth" per mitigare le minacce moderne, combinando controlli infrastrutturali, logici e crittografici.
 | Minaccia / Requisito | Implementazione Tecnica in AEGIS |
 | :--- | :--- |
-| **Vulnerabilità Logiche (BOLA/BFLA)** | Controlli granulari nel Business Layer e uso di identificativi non sequenziali per prevenire accessi orizzontali non autorizzati. |
-| **Enumerazione Dati (IDOR)** | Ricerca missioni esclusivamente tramite **UUID** (Universally Unique Identifier), rendendo impossibile indovinare gli ID delle risorse. |
-| **Session Hijacking** | Sessioni **Stateless** basate su token JWT. Nessuna persistenza di sessione server-side. |
-| **Compromissione Credenziali** | **MFA Obbligatoria (TOTP)**: Keycloak settato con Autenticazione a Due Fattori standard (RFC 6238). L'accesso richiede password + codice OTP generato da app mobile. |
-| **Data Leakage (Files)** | **Crittografia AES-128** a riposo per tutti gli allegati.<br>**Watermarking Dinamico** sui documenti per evitare foto o condivisioni non autorizzate (es. *"RISERVATO: [USER_ID]"*). |
-| **Attacchi Volumetrici (DoS)** | **Bucket4j Rate Limiting**: Filtro attivo su tutti gli endpoint (limite 5000 req/min per IP) per neutralizzare Brute Force e HTTP Flood. |
-| **Phishing & XSS** | **NoLinksValidator**: Blocca URL nelle note.<br>**Sanificazione**: Stripping preventivo dei tag HTML lato frontend. |
-| **Man-in-the-Middle** | **TLS/HTTPS Forzato**: Backend su porta 8443, Database via JDBC SSL, Keycloak su HTTPS. |
-| **Information Disclosure** | **Exception Masking**: Il *GlobalExceptionHandler* sopprime stack trace rivelatori, restituendo messaggi generici. |
-
-### Protocolli crittografici utilizzati
-* **Data in Transit:** Backend utilizza HTTPS (Porta 8443, Keystore PKCS12). Connessione DB via JDBC SSL (`sslmode=require`).
-* **Data at Rest:** File allegati cifrati con **AES-128** previa verifica integrità (**SHA-256**).
-* **Hashing Password:** Gestito da Keycloak tramite standard **PBKDF2/Argon2**.
+| **Vulnerabilità Logiche**<br>(BOLA/BFLA) | **ACL Granulari**: Controlli `PreAuthorize` nel Business Layer per verificare ownership e clearance.<br>**Identificativi Non-Sequenziali**: Uso rigoroso di UUID per impedire l'enumerazione orizzontale. |
+| **Enumerazione Dati**<br>(IDOR) | **UUID Only**: Tutte le risorse (Missioni, Agenti) sono referenziate esclusivamente tramite UUID v4, rendendo impossibile "indovinare" gli ID delle risorse altrui. |
+| **Session Hijacking** | **Stateless**: Sessioni basate interamente su token JWT (JSON Web Token). Nessuna persistenza di sessione server-side vulnerabile a fixation. |
+| **Compromissione Credenziali** | **MFA Obbligatoria**: Keycloak configurato con TOTP (RFC 6238). L'accesso richiede password + codice OTP (Google/MS Authenticator).<br>**No Self-Registration**: Creazione utenze centralizzata. |
+| **Data Leakage (Files)** | **Encryption at Rest**: Tutti gli allegati sono cifrati con AES-128 su disco.<br>**Dynamic Watermarking**: Applicazione "al volo" di filigrane (es. "RISERVATO: [USER_ID]") sui PDF scaricati. |
+| **Attacchi Volumetrici**<br>(DoS/Brute Force) | **Rate Limiting**: Implementazione Bucket4j attiva su tutti gli endpoint. Limite impostato a **5000 req/min per IP** per prevenire flood e brute force. |
+| **Phishing & XSS** | **NoLinksValidator**: Validatore custom che blocca l'inserimento di URL/Hyperlink nelle note.<br>**Sanificazione**: Frontend React effettua escaping automatico dell'output. |
+| **Man-in-the-Middle** | **Full TLS**: Crittografia in transito forzata ovunque.<br>- Backend: Porta 8443 (HTTPS)<br>- DB: JDBC SSL<br>- Keycloak: HTTPS |
+| **Information Disclosure** | **Exception Masking**: Il [GlobalExceptionHandler](cci:2://file:///c:/Users/franc/Desktop/SOAS/AEGIS/backend/aegis-backend/src/main/java/com/aegis/backend/exception/GlobalExceptionHandler.java:8:0-33:1) intercetta le eccezioni di sistema e sopprime gli stack trace, restituendo al client solo messaggi d'errore generici. |
+### Protocolli Crittografici
+| Ambito | Standard / Algoritmo | Note |
+| :--- | :--- | :--- |
+| **Data in Transit** | **TLS 1.2+** | HTTPS forzato su tutti i canali di comunicazione (Client-Server, Server-DB). |
+| **Data at Rest** | **AES-128** | Cifratura simmetrica dei file allegati (implementazione in [MissionService](cci:2://file:///c:/Users/franc/Desktop/SOAS/AEGIS/backend/aegis-backend/src/main/java/com/aegis/backend/service/MissionService.java:42:0-317:1)). |
+| **Data Integrity** | **SHA-256** | Checksum calcolato su upload/download per garantire integrità del payload. |
+| **Password Hashing** | **PBKDF2 / Argon2** | Gestito nativamente da Keycloak (configurabile per Realm). |
+| **Token Signature** | **RS256** | Firma asimmetrica (RSA + SHA-256) per i token JWT. |
 
 ---
 
-## 3. Architettura del Progetto
+## 5. Architettura del Progetto
 L'architettura del sistema è strutturata su un modello a **microservizi containerizzati**, orchestrati per garantire la separazione delle responsabilità e la stabilità operativa. La scelta di decentralizzare i componenti rispetto a un approccio monolitico risponde a due requisiti strutturali:
 
 * **Resilienza e Disaccoppiamento:** La suddivisione in moduli indipendenti (Frontend, Backend, Identity Provider, Database) assicura che le funzionalità siano logicamente e fisicamente separate. Questo previene che errori localizzati compromettano l'intera infrastruttura.
@@ -89,7 +108,7 @@ L'architettura del sistema è strutturata su un modello a **microservizi contain
 </p>
 
 
-### Componenti Funzionali
+### 5.1 Componenti Funzionali
 
 * **Frontend (`aegis-frontend`):** Single Page Application (SPA) sviluppata in **React + Vite**. Funge da interfaccia utente *stateless*, gestendo la sanificazione degli input, la presentazione dei dati oscurati e le interazioni sicure con le API REST.
 * **Backend (`aegis-backend`):** Resource Server basato su **Java 21 / Spring Boot 3**. Costituisce il cuore del sistema: implementa i controlli di accesso granulari (Security Filter Chain), esegue la crittografia  (AES-128) e memorizzazione dei file, gestisce il log di audit immutabile.
@@ -97,7 +116,7 @@ L'architettura del sistema è strutturata su un modello a **microservizi contain
 * **Database (`aegis-db`):** **PostgreSQL 16**. Responsabile della persistenza relazionale di metadati e dati strutturati. Configurata per accettare connessioni esclusivamente via **SSL/TLS** per garantire la protezione dei dati in transito.
 * **Secrets Management (`aegis-vault`):** **HashiCorp Vault**. Sistema centralizzato per la custodia dei segreti (password DB, chiavi API). Le credenziali vengono iniettate dinamicamente nel backend all'avvio (*Dynamic Secrets*), prevenendo la presenza di password in chiaro nel codice sorgente o nei file di configurazione.
 
-### Decisioni architetturali
+### 5.2 Decisioni architetturali
 
 Le decisioni architetturali di Aegis rispondono a precisi requisiti di sicurezza e scalabilità, adottando pattern consolidati nell'ingegneria del software moderna:
 
@@ -116,7 +135,7 @@ Le decisioni architetturali di Aegis rispondono a precisi requisiti di sicurezza
 5.  **Storage Ibrido Ottimizzato:**
     Si adotta una strategia di persistenza mista per massimizzare le performance: i metadati relazionali risiedono su **PostgreSQL**, mentre i payload binari (allegati) sono archiviati su disco locale cifrati con **AES-128**. Questo evita di appesantire il database con BLOB voluminosi, mantenendo le query performanti.
 
-### Albero directory del progetto
+### 5.3 Albero directory del progetto
 
 L'organizzazione del codice sorgente rispetta il principio di **Separazione delle Responsabilità**. La struttura è modulare e separa nettamente il codice applicativo (/aegis-frontend e /aegis-backend) dalla configurazione infrastrutturale (/docker-env) e dal materiale crittografico (/certs e configurazioni ssl: /postgress-ssl, /keyloack-ssl), facilitando la manutenibilità e la sicurezza del deployment.
 
@@ -154,31 +173,21 @@ AEGIS/
 
 ---
 
-## 4. Stack Tecnologico
+## 6. Stack Tecnologico
 
 | Componente | Tecnologia | Ruolo |
 | :--- | :--- | :--- |
-| **Backend** | Java 21, Spring Boot 3 | Resource Server, Business Logic |
-| **Frontend** | React, Vite | Interfaccia Utente SPA  |
-| **Auth** | OIDC, OAuth 2.0, JWT | Standard di Protocollo |
-| **IAM** | Keycloak | Identity Provider, MFA, RBAC  |
-| **Database** | PostgreSQL 16 | Persistenza Dati  |
-| **Security** | HashiCorp Vault | Gestione Segreti  |
-| **Crittografia** | AES-128, SHA-256 | Cifratura Dati e Integrità  |
+| **Backend** | **Java 21**, Spring Boot 3 | Resource Server, Business Logic, Gestione File. |
+| **Frontend** | **React**, Vite | Interfaccia Utente web (SPA) |
+| **Auth** | OIDC, OAuth 2.0, JWT | Standard di Protocollo per Autenticazione e Autorizzazione. |
+| **IAM** | **Keycloak** | Identity Provider (IdP), Gestione MFA, RBAC. |
+| **Database** | **PostgreSQL 16** | Persistenza Dati relazionali e strutturati. |
+| **Security** | **HashiCorp Vault** | Gestione centralizzata e rotazione dei segreti (Secret Management). |
 
-### Approfondimento: Flusso OIDC
-
-Il flusso **OIDC (OpenID Connect)** delega l'autenticazione a Keycloak, che rilascia un token di autorizzazione all'applicazione richiedente.
-
-1.  **Richiesta:** Il client richiede accesso.
-2.  **Concessione:** L'utente si autentica (MFA) su Keycloak.
-3.  **Token:** Keycloak emette un *Access Token* (JWT).
-4.  **Accesso:** Il client allega il token nell'header `Authorization: Bearer`.
-5.  **Verifica:** Il backend valida crittograficamente firma (JWK), scadenza (`exp`) ed emittente (`iss`) prima di servire la risorsa.
 
 ---
 
-## 5. Modello Operativo e Ruoli
+## 7. Modello Operativo e Ruoli
 
 Il sistema gestisce la gerarchia e l'accesso ai dati su tre livelli di segretezza, ispirandosi alla logica **Bell-LaPadula**.
 
@@ -192,12 +201,44 @@ Il sistema gestisce la gerarchia e l'accesso ai dati su tre livelli di segretezz
 > La scelta architetturale di **inibire la registrazione autonoma degli utenti** risponde a un principio fondamentale di sicurezza nazionale. L'accesso deve essere concesso esclusivamente tramite canali istituzionali gerarchici, impedendo a chiunque di registrarsi senza una preventiva verifica della clearance e del Nulla Osta di Sicurezza.
 
 ---
+## 8. Funzionalità Operative del Sistema
 
-## 7. Test d'uso
+Il sistema Aegis offre un set di funzionalità progettate per garantire la compartimentazione delle informazioni e la sicurezza degli operatori, implementando rigorosi vincoli di clearance.
 
-## 8. Test d'abuso
+### 8.1 Autenticazione e Gestione Identità
+* **Accesso Centralizzato:** Il sistema inibisce la registrazione autonoma; le utenze sono pre-caricate a livello statale e l'accesso avviene esclusivamente tramite login centralizzato.
+* **Autenticazione Forte (MFA):** Implementazione di autenticazione a due fattori (OTP) per garantire l'identità dell'operatore.
+* **Anonimato Operativo (Code Name):** I dati anagrafici completi (Nome, Cognome, Telefono, Ufficio) sono visibili esclusivamente ai Supervisor. All'interno delle missioni, l'unico identificativo visibile agli altri partecipanti è il **Code Name**, per proteggere l'identità degli agenti.
 
-## 9. Guida all'Installazione (Docker Environment)
+### 8.2 Gestione Missioni (Supervisor)
+* **Creazione Vincolata:** I Supervisor possono creare missioni definendo Zona Geografica, Descrizione e Livello di Sicurezza.
+    * *Vincolo di Sicurezza:* È possibile creare missioni solo con livello di segretezza uguale o inferiore al proprio (es. un Supervisor Livello 2 non può creare una missione Livello 3).
+* **Gestione Operatori:** Assegnazione degli agenti tramite barra di ricerca.
+    * *Vincolo di Assegnazione:* Il sistema permette di aggiungere solo utenti con clearance maggiore o uguale a quella della missione.
+* **Workflow:** Gestione del ciclo di vita della missione con stati definiti (In istruttoria, Standby, In corso, Abortita, Conclusa) e indicatori visivi.
+
+### 8.3 Operatività e Comunicazione (Agent)
+* **Accesso Puntuale (UUID):** L'agente non dispone di funzionalità di ricerca libera o esplorativa. L'accesso alle missioni avviene esclusivamente tramite inserimento diretto del **UUID univoco** della missione. Il backend verifica l'assegnazione prima di concedere l'accesso: se l'agente non fa parte del team, la richiesta viene respinta (*403 Forbidden*), impedendo il *Forced Browsing*.
+* **Interazione Vincolata (No Upload):** Per massimizzare la sicurezza, l'agente opera in modalità ristretta: non possiede permessi per il caricamento di file o allegati, ma può consultare la documentazione esistente in sola lettura.
+* **Canale di Aggiornamento Sicuro:** L'unica modalità di scrittura consentita è la **Chat Criptata Mission-Specific**:
+    * Consente l'invio di aggiornamenti operativi testuali in tempo reale.
+    * **Input Sanitization:** Ogni messaggio è sottoposto a rigorosi filtri di validazione (Anti-Script/XSS) lato server *prima* di essere processato, garantendo che nessun codice malevolo possa essere iniettato nel sistema di comunicazione.
+
+### 8.4 Super Supervisor (Governance & Audit)
+Il ruolo di **Super Supervisor** rappresenta il vertice della catena di comando e di garanzia del sistema. A differenza dei ruoli operativi, possiede privilegi di amministrazione e audit estesi per garantire la sicurezza dello Stato:
+
+* **Visibilità Globale (System High):** Accesso in lettura a **tutte le missioni** presenti nel sistema, indipendentemente dal livello di segretezza o dalla compartimentazione, per finalità di controllo, audit e supervisione strategica.
+* **Gestione Dossier Personale:** Accesso completo ai fascicoli anagrafici di ogni Agente e Supervisor. È l'unica figura in grado di visualizzare l'identità reale associata ai *Code Name* (Nome, Cognome, Matricola, Riferimenti diretti) per tutti gli operatori censiti.
+* **Autorità sulle Clearance (NOS):** È l'unica figura abilitata a **modificare il Livello di Sicurezza** degli utenti. Può promuovere un operatore (es. da Livello 1 a Livello 2) o, in caso di incidenti di sicurezza, sospenderlo immediatamente (declassamento a Livello 0), revocando l'accesso al sistema.
+* **Intervento Operativo:** Ha la facoltà di intervenire forzatamente sul ciclo di vita di qualsiasi missione (es. forzare lo stato in *Abortita* o *Conclusa*) qualora la sicurezza operativa sia compromessa, senza necessitare dell'assegnazione diretta alla missione stessa.
+
+---
+
+## 9. Test d'uso
+
+## 10. Test d'abuso
+
+## 11. Guida all'Installazione (Docker Environment)
 
 **Prerequisiti:** Docker Desktop, Java 21, Node.js 20+.
 
@@ -236,7 +277,7 @@ Nota: Essendo un ambiente locale con certificati auto-firmati (certs/), sarà ne
 > * `MAC_SETUP.md`
 > * `LINUX_SETUP.md`
 
-## 10. Riferimenti Normativi e Teorici
+## 12. Riferimenti Normativi e Teorici
 
 L'architettura di sicurezza di Aegis è stata progettata in conformità con i seguenti standard governativi e modelli accademici:
 
@@ -247,7 +288,7 @@ L'architettura di sicurezza di Aegis è stata progettata in conformità con i se
 * **[NIST SP 800-207](https://csrc.nist.gov/publications/detail/sp/800-207/final)** – *"Zero Trust Architecture"*: Standard statunitense che guida l'approccio architetturale del progetto, basato sul principio che nessuna fiducia sia implicita (indipendentemente dalla posizione di rete) e sulla verifica continua di ogni transazione.
 
 
-## 11. Risoluzione Problemi (Troubleshooting)
+## 13. Risoluzione Problemi (Troubleshooting)
 
 In caso di difficoltà durante l'avvio o l'utilizzo della piattaforma in ambiente locale, consultare la seguente tabella:
 
