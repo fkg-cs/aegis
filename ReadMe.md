@@ -7,6 +7,23 @@
 
 ---
 
+## Indice dei Contenuti
+1. [Visione del Progetto e Metodologia](#1-visione-del-progetto-e-metodologia)
+2. [Governance, Normativa e Sovranità del Dato](#2-governance-normativa-e-sovranità-del-dato)
+3. [Pilastri Tecnici di Sicurezza](#3-pilastri-tecnici-di-sicurezza-zero-trust-implementation)
+4. [Matrice di Sicurezza & Defense in Depth](#4-matrice-di-sicurezza--defense-in-depth)
+5. [Architettura del Progetto](#5-architettura-del-progetto)
+6. [Stack Tecnologico](#6-stack-tecnologico)
+7. [Modello Operativo e Ruoli](#7-modello-operativo-e-ruoli)
+8. [Funzionalità Operative del Sistema](#8-funzionalità-operative-del-sistema)
+9. [Test d'Uso (Happy Path & Constraints)](#9-test-duso-happy-path--constraints)
+10. [Test d'Abuso (Security Stress Test)](#10-test-dabuso-security-stress-test)
+11. [Guida all'Installazione](#11-guida-allinstallazione)
+12. [Riferimenti Normativi](#12-riferimenti-normativi-e-teorici)
+13. [Troubleshooting](#13-risoluzione-problemi-troubleshooting)
+
+---
+
 ## 1. Visione del Progetto e Metodologia
 
 **Aegis** è un sistema informativo web progettato per rispondere ai requisiti critici delle Agenzie di Informazione e Sicurezza (es. *AISE* e *AISI*).
@@ -84,7 +101,7 @@ Aegis implementa una strategia di difesa a più livelli "Defense in Depth" per m
 | **Compromissione Credenziali** | **MFA Obbligatoria**: Keycloak configurato con TOTP (RFC 6238). L'accesso richiede password + codice OTP (Google/MS Authenticator).<br>**No Self-Registration**: Creazione utenze centralizzata. |
 | **Data Leakage (Files)** | **Encryption at Rest**: Tutti gli allegati sono cifrati con AES-128 su disco.<br>**Dynamic Watermarking**: Applicazione "al volo" di filigrane (es. "RISERVATO: [USER_ID]") sui PDF scaricati. |
 | **Attacchi Volumetrici**<br>(DoS/Brute Force) | **Rate Limiting**: Implementazione Bucket4j attiva su tutti gli endpoint. Limite impostato a **5000 req/min per IP** per prevenire flood e brute force. |
-| **Phishing & XSS** | **NoLinksValidator**: Validatore custom che blocca l'inserimento di URL/Hyperlink nelle note.<br>**Sanificazione**: Frontend React effettua escaping automatico dell'output. |
+| **Phishing & XSS** | **NoLinksValidator**: Validatore custom che blocca l'inserimento di URL/Hyperlink nei campi di input.<br>**Sanificazione**: Frontend React effettua escaping automatico dell'output. |
 | **Man-in-the-Middle** | **Full TLS**: Crittografia in transito forzata ovunque.<br>- Backend: Porta 8443 (HTTPS)<br>- DB: JDBC SSL<br>- Keycloak: HTTPS |
 | **Information Disclosure** | **Exception Masking**: Il [GlobalExceptionHandler](cci:2://file:///c:/Users/franc/Desktop/SOAS/AEGIS/backend/aegis-backend/src/main/java/com/aegis/backend/exception/GlobalExceptionHandler.java:8:0-33:1) intercetta le eccezioni di sistema e sopprime gli stack trace, restituendo al client solo messaggi d'errore generici. |
 ### Protocolli Crittografici
@@ -234,13 +251,63 @@ Il ruolo di **Super Supervisor** rappresenta il vertice della catena di comando 
 
 ---
 
-## 9. Test d'uso
+## 9. Test d'Uso (Scenari Legittimi per Ruolo)
+Questa sezione documenta le funzionalità operative consentite ("Happy Path") per ciascuna tipologia di utente, verificando la corretta applicazione dei privilegi e dei flussi di lavoro.
 
-## 10. Test d'abuso
+### 9.1 Funzionalità Comuni (Tutti gli Utenti)
+* **Login Sicuro:** Accesso al sistema inserendo Matricola e Password. Il sistema verifica le credenziali contro l'Identity Provider (Keycloak).
+* **Verifica MFA:** Dopo il primo step, l'utente inserisce il codice OTP (6 cifre) generato dall'app Authenticator. L'accesso è garantito solo se entrambi i fattori sono validi.
+* **Logout:** Disconnessione sicura che invalida la sessione lato client e server.
 
-## 11. Guida all'Installazione (Docker Environment)
+### 9.2 Ruolo: AGENT (Livello Operativo)
+L'agente è il profilo con i permessi più restrittivi.
+* **Accesso Missione (tramite UUID):** L'agente incolla l'UUID di una missione a lui comunicato. Se assegnato, accede alla dashboard; in caso contrario, riceve un errore di autorizzazione.
+* **Visualizzazione Dati:** All'interno della missione, consulta dettagli, descrizione e lista partecipanti (visualizzando solo i *Code Name* dei colleghi).
+* **Comunicazione Criptata:** Invia messaggi di aggiornamento nella chat sicura della missione.
+* **Lettura Documenti:** Scarica e visualizza i PDF allegati (che appaiono con watermark dinamico).
 
-**Prerequisiti:** Docker Desktop, Java 21, Node.js 20+.
+### 9.3 Ruolo: SUPERVISOR (Livello Tattico)
+Il Supervisor gestisce il coordinamento e la creazione delle operazioni.
+* **Creazione Missione:** Compila il form di nuova missione (Zona, Descrizione) impostando un livello di segretezza **uguale o inferiore** al proprio (es. un Supervisor Livello 2 non può creare missioni Livello 3).
+* **Gestione Team:** Cerca utenti nel database e li assegna alla missione. Il sistema permette l'aggiunta solo di operatori con **Clearance sufficiente** (>= livello missione).
+* **Gestione Ciclo di Vita:** Modifica lo stato della missione (es. da "In Istruttoria" a "In Corso" o "Conclusa").
+* **Visualizzazione Profili:** Ha accesso ai dati anagrafici completi (Nome, Cognome, Ufficio) degli agenti che coordina.
+
+### 9.4 Ruolo: SUPER SUPERVISOR (Livello Strategico/Audit)
+Il vertice della catena di comando con permessi di governance.
+* **Audit Globale:** Visualizza l'elenco completo di **tutte le missioni** nel sistema, indipendentemente dal livello di segretezza o dall'assegnazione.
+* **Gestione Clearance (NOS):** Accede al pannello di amministrazione per elevare o revocare il livello di sicurezza (0-3) degli altri utenti.
+* **Intervento d'Emergenza:** Può forzare la chiusura ("Abortita") di qualsiasi missione in corso per motivi di sicurezza nazionale.
+* **Accesso Anagrafica Completa:** Visualizza l'identità reale di qualsiasi *Code Name* presente nel sistema.
+
+---
+
+## 10. Test d'Abuso (Security Stress Test)
+Questa sezione documenta i tentativi deliberati di violare i vincoli di sicurezza ("Negative Testing") per dimostrare la resilienza dell'architettura Zero Trust.
+
+### Scenario A: Violazione della Gerarchia (No Read Up)
+* **Azione:** Un `Agente` (Livello 1) tenta di accedere a una missione di Livello 2 inserendo l'UUID corretto nella barra degli indirizzi.
+* **Risultato:** Il sistema risponde con **403 Forbidden**. Il controllo accessi (Bell-LaPadula) blocca la richiesta a livello di Backend prima di interrogare il database.
+
+### Scenario B: Privilege Escalation Orizzontale (IDOR)
+* **Azione:** Un `Supervisor` prova a modificare i dettagli di una missione creata da un collega (di cui non fa parte) manipolando l'ID nella chiamata API `PUT /api/missions/{UUID}`.
+* **Risultato:** Il sistema risponde con **403 Forbidden**. Il Security Filter verifica che l'utente non sia né l'owner né un partecipante autorizzato.
+
+### Scenario C: Injection nella Chat (XSS/Scripting)
+* **Azione:** Un operatore invia nella chat criptata un payload malevolo: `<script>alert('HACKED')</script>` o un link esterno `http://malware.site`.
+* **Risultato:**
+    * **XSS:** Il messaggio viene sanificato; il codice non viene eseguito nel browser degli altri partecipanti.
+    * **Link:** Il validatore input rifiuta il messaggio o rimuove il collegamento ipertestuale, impedendo rischi di phishing.
+
+### Scenario D: Bypass dell'Autenticazione (Direct API Access)
+* **Azione:** Un attaccante tenta di invocare le API di Backend (es. `https://localhost:8443/api/missions`) usando `curl` o Postman senza passare dal Frontend e senza Header Authorization.
+* **Risultato:** Il sistema risponde con **401 Unauthorized**. Le API non sono esposte pubblicamente e richiedono un Bearer Token JWT valido e firmato da Keycloak.
+
+---
+
+## 11. Guida all'Installazione 
+
+**Prerequisiti:** Docker, Java 21, Node.js 20+.
 
 ### 1. Avvio Infrastruttura
 Lanciare i servizi di supporto (DB, Keycloak, Vault).
