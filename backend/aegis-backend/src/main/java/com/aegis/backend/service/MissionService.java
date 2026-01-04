@@ -49,7 +49,6 @@ public class MissionService {
     private final Path fileStorageLocation;
 
     // --- 🔐 CHIAVE DI CIFRATURA (AES-128) ---
-    // --- 🔐 CHIAVE DI CIFRATURA (AES-128) ---
     // TODO: In produzione utilizzare variabili d'ambiente 
     private static final String SECRET_KEY = "AegisIntelSecret"; // 16 caratteri esatti = 128 bit
     private static final String ALGORITHM = "AES";

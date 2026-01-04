@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     private final AgentProfileRepository agentRepository;
+    private final com.aegis.backend.service.KeycloakAdminService keycloakService;
 
     // 1. LISTA COMPLETA AGENTI (Escluso me stesso)
     // Utilizza controlli multipli per gestire diverse configurazioni dei ruoli (con/senza prefisso ROLE_)
@@ -39,6 +40,13 @@ public class AdminController {
                 .orElseThrow(() -> new RuntimeException("Agente non trovato"));
 
         agent.setClearanceLevel(newLevel);
-        return ResponseEntity.ok(agentRepository.save(agent));
+
+        // SYNC SU KEYCLOAK (Source of Truth)
+        // Eseguiamo PRIMA la sync remota. Se fallisce, l'eccezione blocca il salvataggio locale.
+        keycloakService.updateUserClearance(username, newLevel);
+
+        AgentProfile saved = agentRepository.save(agent);
+
+        return ResponseEntity.ok(saved);
     }
 }

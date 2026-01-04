@@ -194,7 +194,7 @@ public class MissionController {
 
     // 8. Aggiunta Nota 
     @PostMapping("/{id}/notes")
-    @PreAuthorize("hasAnyAuthority('SUPER_SUPERVISOR', 'ROLE_SUPER_SUPERVISOR') or (hasAnyAuthority('SUPERVISOR', 'ROLE_SUPERVISOR') and @securityService.canAccessMission(#id, authentication))")
+    @PreAuthorize("hasAnyAuthority('SUPER_SUPERVISOR', 'ROLE_SUPER_SUPERVISOR') or @securityService.canAccessMission(#id, authentication)")
     public ResponseEntity<MissionDTO> addNote(
             @PathVariable UUID id,
             @RequestBody String content,

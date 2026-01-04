@@ -269,7 +269,10 @@ function App() {
         try {
             await api.patch(`/admin/agents/${username}/clearance?newLevel=${newLevel}`);
             showToast(`Clearance ${username} -> LIV ${newLevel}`, "success");
-        } catch (err) { showToast("Errore aggiornamento", "error"); }
+        } catch (err) {
+            const msg = err.response?.data || "Errore sconosciuto";
+            showToast("ERRORE: " + msg, "error");
+        }
     };
 
     const handleSearchAgent = async (value) => {
