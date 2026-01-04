@@ -12,7 +12,7 @@
 **Aegis** è un sistema informativo web progettato per rispondere ai requisiti critici delle Agenzie di Informazione e Sicurezza (es. *AISE* e *AISI*).
 La piattaforma supera i tradizionali gestionali monolitici adottando un'architettura a **microservizi dockerizzati**, orchestrata per garantire resilienza e isolamento operativo.
 
-Lo sviluppo segue rigorosamente la metodologia **Shift Left**, integrando la *Security by Design* in ogni fase del ciclo di vita del software. L'obiettivo è superare i modelli di difesa perimetrale classici in favore di un approccio **Zero Trust**: in questo scenario, nessuna entità — utente, server o servizio — gode di fiducia implicita, indipendentemente dalla sua collocazione fisica o di rete.
+Lo sviluppo ha seguito la metodologia **Shift Left**, integrando la *Security by Design* in ogni fase del ciclo di vita del software. L'obiettivo è superare i modelli di difesa perimetrale classici in favore di un approccio **Zero Trust**: in questo scenario, nessuna entità, utente o servizio gode di fiducia implicita, indipendentemente dalla sua collocazione fisica o di rete.
 
 ---
 
@@ -56,17 +56,6 @@ Inoltre, i servizi infrastrutturali (Database, Vault) sono isolati in container 
 * **A Riposo:** I file sensibili (es. PDF operativi) sono cifrati con algoritmo **AES-128** appena toccano il disco. Nemmeno l'amministratore di sistema può leggerne il contenuto senza la chiave di decifratura gestita logicamente dall'applicazione.
 
 ---
-
-### Obiettivi Strategici e di Governance
-Il sistema persegue la creazione di un ecosistema di intelligence resiliente, fondato su una catena di fiducia verificabile garantita da enti terzi:
-
-* **Anagrafe Centralizzata e Certificata:** Aegis inibisce strutturalmente l'autoregistrazione. L'accreditamento del personale (Agenti e Supervisori) è delegato esclusivamente a un'autorità garante (es. *PCM - Presidenza del Consiglio dei Ministri* o *DIS*). Le identità digitali vengono rilasciate solo a fronte di un valido *Nulla Osta di Sicurezza* (NOS), eliminando alla radice il rischio di utenze non verificate o "fantasma".
-
-### Architettura dei Dati e Sovranità
-Il progetto adotta una strategia di gestione dati "a doppio livello" per bilanciare la segretezza operativa con il controllo democratico:
-
-1.  **Gestione Operativa In-House:** I documenti classificati e i dossier di missione sono cifrati e residenti sull'infrastruttura dell'Agenzia operativa, assicurando la totale ermeticità delle informazioni coperte da Segreto di Stato.
-2.  **Audit Centralizzato per la Garanzia:** L'infrastruttura di supporto (Database Docker, Secret Management su Vault) è centralizzata e immutabile. Questo permette l'ispezionabilità tecnica da parte degli organi parlamentari di controllo (es. *COPASIR*), che possono verificare l'integrità del sistema e i log di accesso senza necessariamente accedere al contenuto in chiaro dei dossier operativi.
 
 ### Matrice di Sicurezza & Defense in Depth
 Aegis implementa controlli a più livelli per mitigare le minacce moderne:
