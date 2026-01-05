@@ -72,20 +72,20 @@ Il progetto adotta una strategia di gestione dati a doppio livello per bilanciar
 Il sistema assume che la rete sia "ostile" e protegge i dati e le risorse a livello applicativo, invece di affidarsi solo al firewall perimetrale applicato in deploy. 
 <br>DI seguito sono riportati i principi che rendono "Zero Trust" AEGIS:
 
-### A. "Never Trust, Always Verify" (Verifica Continua)
+### 3.1. "Never Trust, Always Verify" (Verifica Continua)
 Il Backend **non si fida implicitamente** del Frontend o della rete locale.
 Ogni singola richiesta HTTP verso le API viene intercettata dal `SecurityFilterChain` e validata crittograficamente. Se il token JWT non è valido, non è firmato correttamente da Keycloak o è scaduto, la richiesta viene respinta istantaneamente con `401 Unauthorized` o `403 Forbidden`, anche se proviene dall'interno della rete aziendale protetta.
 
-### B. Principio del Privilegio Minimo (Least Privilege)
+### 3.2. Principio del Privilegio Minimo (Least Privilege)
 Abbiamo implementato l'accesso gerarchico rigoroso basato sul modello **Bell-LaPadula**:
 * **Controllo Puntuale:** Un utente con ruolo `AGENT` può vedere solo le missioni a lui assegnate; questo controllo è verificato a livello di codice nel `MissionController`.
 * **Blocco Verticale:** Un utente con clearance "Livello 1" viene bloccato dal sistema se tenta di accedere a una missione "Livello 2", anche se è in possesso di un URL valido (prevenzione *Forced Browsing*).
 
-### C. Micro-Segmentazione e Identità
+### 3.3. Micro-Segmentazione e Identità
 L'identità è gestita centralmente da **Keycloak**. Non esistono "utenti anonimi" o "super-user" hardcoded nel database che possano bypassare i controlli di sicurezza.
 Inoltre, i servizi infrastrutturali (Database, Vault) sono isolati in container specifici e non espongono porte non necessarie verso l'esterno, riducendo la superficie d'attacco laterale.
 
-### D. Protezione dei Dati (Data Protection)
+### 3.4. Protezione dei Dati (Data Protection)
 * **In Transito:** Tutto il traffico è forzato su protocollo HTTPS sicuro (Porta 8443) con TLS 1.3.
 * **A Riposo:** I file sensibili (es. PDF operativi) sono cifrati con algoritmo **AES-128** appena toccano il disco. Nemmeno l'amministratore di sistema può leggerne il contenuto senza la chiave di decifratura gestita logicamente dall'applicazione.
 
@@ -104,14 +104,6 @@ Aegis implementa una strategia di difesa a più livelli "Defense in Depth" per m
 | **Phishing & XSS** | **NoLinksValidator**: Validatore custom che blocca l'inserimento di URL/Hyperlink nei campi di input.<br>**Sanificazione**: Frontend React effettua escaping automatico dell'output. |
 | **Man-in-the-Middle** | **Full TLS**: Crittografia in transito forzata ovunque.<br>- Backend: Porta 8443 (HTTPS)<br>- DB: JDBC SSL<br>- Keycloak: HTTPS |
 | **Information Disclosure** | **Exception Masking**: Il [GlobalExceptionHandler](cci:2://file:///c:/Users/franc/Desktop/SOAS/AEGIS/backend/aegis-backend/src/main/java/com/aegis/backend/exception/GlobalExceptionHandler.java:8:0-33:1) intercetta le eccezioni di sistema e sopprime gli stack trace, restituendo al client solo messaggi d'errore generici. |
-### Protocolli Crittografici
-| Ambito | Standard / Algoritmo | Note |
-| :--- | :--- | :--- |
-| **Data in Transit** | **TLS 1.2+** | HTTPS forzato su tutti i canali di comunicazione (Client-Server, Server-DB). |
-| **Data at Rest** | **AES-128** | Cifratura simmetrica dei file allegati (implementazione in [MissionService](cci:2://file:///c:/Users/franc/Desktop/SOAS/AEGIS/backend/aegis-backend/src/main/java/com/aegis/backend/service/MissionService.java:42:0-317:1)). |
-| **Data Integrity** | **SHA-256** | Checksum calcolato su upload/download per garantire integrità del payload. |
-| **Password Hashing** | **PBKDF2 / Argon2** | Gestito nativamente da Keycloak (configurabile per Realm). |
-| **Token Signature** | **RS256** | Firma asimmetrica (RSA + SHA-256) per i token JWT. |
 
 ---
 
@@ -201,6 +193,14 @@ AEGIS/
 | **Database** | **PostgreSQL 16** | Persistenza Dati relazionali e strutturati. |
 | **Security** | **HashiCorp Vault** | Gestione centralizzata e rotazione dei segreti (Secret Management). |
 
+### 6.1 Protocolli Crittografici
+| Ambito | Standard / Algoritmo | Note |
+| :--- | :--- | :--- |
+| **Data in Transit** | **TLS 1.2+** | HTTPS forzato su tutti i canali di comunicazione (Client-Server, Server-DB). |
+| **Data at Rest** | **AES-128** | Cifratura simmetrica dei file allegati (implementazione in [MissionService](cci:2://file:///c:/Users/franc/Desktop/SOAS/AEGIS/backend/aegis-backend/src/main/java/com/aegis/backend/service/MissionService.java:42:0-317:1)). |
+| **Data Integrity** | **SHA-256** | Checksum calcolato su upload/download per garantire integrità del payload. |
+| **Password Hashing** | **PBKDF2 / Argon2** | Gestito nativamente da Keycloak (configurabile per Realm). |
+| **Token Signature** | **RS256** | Firma asimmetrica (RSA + SHA-256) per i token JWT. |
 
 ---
 
@@ -228,7 +228,7 @@ Il sistema Aegis offre un set di funzionalità progettate per garantire la compa
 * **Anonimato Operativo (Code Name):** I dati anagrafici completi (Nome, Cognome, Telefono, Ufficio) sono visibili esclusivamente ai Supervisor. All'interno delle missioni, l'unico identificativo visibile agli altri partecipanti è il **Code Name**, per proteggere l'identità degli agenti.
 
 ### 8.2 Gestione Missioni (Supervisor)
-* **Creazione Vincolata:** I Supervisor possono creare missioni definendo Zona Geografica, Descrizione e Livello di Sicurezza.
+* **Creazione Vincolata:** I Supervisor possono creare missioni definendo zona geografica, descrizione, documento missione allegato e livello di sicurezza minimo richiesto.
     * *Vincolo di Sicurezza:* È possibile creare missioni solo con livello di segretezza uguale o inferiore al proprio (es. un Supervisor Livello 2 non può creare una missione Livello 3).
 * **Gestione Operatori:** Assegnazione degli agenti tramite barra di ricerca.
     * *Vincolo di Assegnazione:* Il sistema permette di aggiungere solo utenti con clearance maggiore o uguale a quella della missione.
@@ -329,30 +329,45 @@ Il Supervisor gestisce il coordinamento e la creazione delle operazioni, UI ORAN
 ### 9.4 Ruolo: SUPER SUPERVISOR (Livello Strategico/Audit)
 Il vertice della catena di comando con permessi di governance, UI PURPLE.
 * **Audit Globale:** Visualizza l'elenco completo di **tutte le missioni** nel sistema, indipendentemente dal livello di segretezza o dall'assegnazione.
+  <p align="center">
+  <img src="./docs/images/supsupmissions.png" width="700" alt="pannello controllo supersupervisor">
+</p>
+
 * **Gestione Clearance (NOS):** Accede al database di **tutti gli utenti**: agenti e supervisor, può elevare o revocare il livello di sicurezza (0-3).
+ <p align="center">
+  <img src="./docs/images/supsupagents.png" width="700" alt="pannello controllo supersupervisor">
+</p>
+
 * **Intervento d'Emergenza:** Può forzare la chiusura ("Abortita") di qualsiasi missione in corso per motivi di sicurezza o cambiarne lo stato.
+ <p align="center">
+  <img src="./docs/images/supsupmissionabort.png" width="700" alt="pannello controllo supersupervisor">
+</p>
+
 * **Accesso Anagrafica Completa:** Visualizza l'identità reale di qualsiasi *Code Name* presente nel sistema visionando il suo dossier.
+ <p align="center">
+  <img src="./docs/images/supsuagentdossier.png" width="700" alt="pannello controllo supersupervisor">
+</p>
 
 ---
 
 ## 10. Test d'Abuso (Security Stress Test)
 Questa sezione documenta i tentativi deliberati di violare i vincoli di sicurezza ("Negative Testing") per dimostrare la resilienza dell'architettura Zero Trust.
 
-### Scenario A: Violazione della Gerarchia (No Read Up)
+### 10.1 Violazione della Gerarchia (No Read Up)
 * **Azione:** Un `Agente` (Livello 1) tenta di accedere a una missione di Livello 2 inserendo l'UUID corretto nella barra degli indirizzi.
 * **Risultato:** Il sistema risponde con **403 Forbidden**. Il controllo accessi (Bell-LaPadula) blocca la richiesta a livello di Backend prima di interrogare il database.
 
-### Scenario B: Privilege Escalation Orizzontale (IDOR)
+### 10.2 Privilege Escalation Orizzontale (IDOR)
 * **Azione:** Un `Supervisor` prova a modificare i dettagli di una missione creata da un collega (di cui non fa parte) manipolando l'ID nella chiamata API `PUT /api/missions/{UUID}`.
 * **Risultato:** Il sistema risponde con **403 Forbidden**. Il Security Filter verifica che l'utente non sia né l'owner né un partecipante autorizzato.
 
-### Scenario C: Injection nella Chat (XSS/Scripting)
+### 10.3 Injection nella Chat (XSS/Scripting)
 * **Azione:** Un operatore invia nella chat criptata un payload malevolo: `<script>alert('HACKED')</script>` o un link esterno `http://malware.site`.
 * **Risultato:**
     * **XSS:** Il messaggio viene sanificato; il codice non viene eseguito nel browser degli altri partecipanti.
     * **Link:** Il validatore input rifiuta il messaggio o rimuove il collegamento ipertestuale, impedendo rischi di phishing.
 
-### Scenario D: Bypass dell'Autenticazione (Direct API Access)
+### 10.4 Bypass dell'Autenticazione (Direct API Access)
 * **Azione:** Un attaccante tenta di invocare le API di Backend (es. `https://localhost:8443/api/missions`) usando `curl` o Postman senza passare dal Frontend e senza Header Authorization.
 * **Risultato:** Il sistema risponde con **401 Unauthorized**. Le API non sono esposte pubblicamente e richiedono un Bearer Token JWT valido e firmato da Keycloak.
 
