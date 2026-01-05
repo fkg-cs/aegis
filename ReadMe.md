@@ -249,36 +249,89 @@ Il ruolo di **Super Supervisor** rappresenta il vertice della catena di comando 
 * **Autorità sulle Clearance (NOS):** È l'unica figura abilitata a **modificare il Livello di Sicurezza** degli utenti. Può promuovere un operatore (es. da Livello 1 a Livello 2) o, in caso di incidenti di sicurezza, sospenderlo immediatamente (declassamento a Livello 0), revocando l'accesso al sistema.
 * **Intervento Operativo:** Ha la facoltà di intervenire forzatamente sul ciclo di vita di qualsiasi missione (es. forzare lo stato in *Abortita* o *Conclusa*) qualora la sicurezza operativa sia compromessa, senza necessitare dell'assegnazione diretta alla missione stessa.
 
+### 8.5 Design System e Feedback Visivo (UX Semiotics)
+L'interfaccia grafica (GUI) di Aegis adotta un tema **Dark Cyberpunk** moderno e immersivo. Questa scelta stilistica non è puramente estetica ma funzionale: il design scuro ad alto contrasto è ottimizzato per **ridurre l'affaticamento visivo** (*Eye Strain*) degli operatori impegnati in sessioni prolungate, specialmente in ambienti operativi a bassa luminosità o notturni.<br>
+Per garantire la **Situational Awareness** immediata e prevenire errori di contesto (es. credere di essere in un ruolo diverso), l'interfaccia di Aegis adatta dinamicamente il proprio schema cromatico (Theme) in base al profilo dell'utente loggato.
+Ogni colore è stato selezionato secondo precisi criteri semiotici per riflettere la natura del ruolo:
+
+* 🔵 **AGENT - Tactical Blue (Blu Operativo)**
+    * **Significato:** Il blu evoca stabilità, fiducia e calma sotto pressione.
+    * **Funzione:** Progettato per gli operatori sul campo che necessitano di chiarezza mentale e focus assoluto sull'esecuzione della missione, riducendo l'affaticamento visivo durante la lettura delle informazioni sensibili.
+
+* 🟠 **SUPERVISOR - Alert Orange (Arancio Tattico)**
+    * **Significato:** L'arancione rappresenta l'attenzione, l'energia e la vigilanza attiva.
+    * **Funzione:** Evidenzia il ruolo di coordinamento. Mantiene il Supervisore in stato di allerta, facilitando l'identificazione rapida di anomalie, cambi di stato critici e la gestione dinamica delle risorse.
+
+* 🟣 **SUPER SUPERVISOR - Governance Purple (Viola Imperiale)**
+    * **Significato:** Il viola è storicamente associato all'autorità suprema, alla saggezza e al giudizio.
+    * **Funzione:** Distingue nettamente il livello di Audit/Governance dalla catena operativa standard. Sottolinea il potere di intervento straordinario (es. abortire missioni, revocare NOS) e la visione onnisciente ("God Mode") sul sistema.
 ---
 
 ## 9. Test d'Uso (Scenari Legittimi per Ruolo)
-Questa sezione documenta le funzionalità operative consentite ("Happy Path") per ciascuna tipologia di utente, verificando la corretta applicazione dei privilegi e dei flussi di lavoro.
+Questa sezione documenta le funzionalità operative consentite "Happy Path" per ciascuna tipologia di utente, verificando la corretta applicazione dei privilegi e dei flussi di lavoro.
 
 ### 9.1 Funzionalità Comuni (Tutti gli Utenti)
-* **Login Sicuro:** Accesso al sistema inserendo Matricola e Password. Il sistema verifica le credenziali contro l'Identity Provider (Keycloak).
+* **Login Sicuro:** Accesso al sistema inserendo username o email e Password. Il sistema verifica le credenziali contro l'Identity Provider (Keycloak).
+ <p align="center">
+  <img src="./docs/images/login.png" width="700" alt="Schema Architettura Aegis">
+</p>
+
 * **Verifica MFA:** Dopo il primo step, l'utente inserisce il codice OTP (6 cifre) generato dall'app Authenticator. L'accesso è garantito solo se entrambi i fattori sono validi.
-* **Logout:** Disconnessione sicura che invalida la sessione lato client e server.
+<p align="center">
+  <img src="./docs/images/login-otp.png" width="700" alt="schermata abilitazione otp">
+</p>
+
+* **Logout:** Disconnessione sicura che invalida l'autenticazione.
+<p align="center">
+  <img src="./docs/images/logout.png" width="700" alt="logout">
+</p>
 
 ### 9.2 Ruolo: AGENT (Livello Operativo)
-L'agente è il profilo con i permessi più restrittivi.
+L'agente è il profilo con i permessi più restrittivi, UI BLU.
 * **Accesso Missione (tramite UUID):** L'agente incolla l'UUID di una missione a lui comunicato. Se assegnato, accede alla dashboard; in caso contrario, riceve un errore di autorizzazione.
+<p align="center">
+  <img src="./docs/images/searchmission_agent.png" width="700" alt="ricerca missione via UUID">
+</p>
+
 * **Visualizzazione Dati:** All'interno della missione, consulta dettagli, descrizione e lista partecipanti (visualizzando solo i *Code Name* dei colleghi).
-* **Comunicazione Criptata:** Invia messaggi di aggiornamento nella chat sicura della missione.
-* **Lettura Documenti:** Scarica e visualizza i PDF allegati (che appaiono con watermark dinamico).
+<p align="center">
+  <img src="./docs/images/missionpage_agent.png" width="700" alt="pagina missione">
+</p>
+
+* **Comunicazione Criptata:** Lettura o invio messaggi di aggiornamento nella chat sicura della missione.
+<p align="center">
+  <img src="./docs/images/chat_agent.png" width="700" alt="pagina missione">
+</p>
+
+* **Lettura Documenti:** Scarica e visualizza i PDF allegati (che appaiono con watermark dinamico anti photoleak).
+<p align="center">
+  <img src="./docs/images/doclink_agent.png" width="700" alt="pagina missione link documento">
+</p>
+<p align="center">
+  <img src="./docs/images/docopen_agent.png" width="700" alt="documento aperto">
+</p>
 
 ### 9.3 Ruolo: SUPERVISOR (Livello Tattico)
-Il Supervisor gestisce il coordinamento e la creazione delle operazioni.
+Il Supervisor gestisce il coordinamento e la creazione delle operazioni, UI ORANGE.
+
 * **Creazione Missione:** Compila il form di nuova missione (Zona, Descrizione) impostando un livello di segretezza **uguale o inferiore** al proprio (es. un Supervisor Livello 2 non può creare missioni Livello 3).
+<p align="center">
+  <img src="./docs/images/supervisorui.png" width="700" alt="interfaccia ui supervisor">
+</p>
+
 * **Gestione Team:** Cerca utenti nel database e li assegna alla missione. Il sistema permette l'aggiunta solo di operatori con **Clearance sufficiente** (>= livello missione).
 * **Gestione Ciclo di Vita:** Modifica lo stato della missione (es. da "In Istruttoria" a "In Corso" o "Conclusa").
-* **Visualizzazione Profili:** Ha accesso ai dati anagrafici completi (Nome, Cognome, Ufficio) degli agenti che coordina.
+* **Visualizzazione Profili:** Ha accesso ai dati anagrafici completi (Nome, Cognome, Ufficio) degli agenti che coordina. 
+<p align="center">
+  <img src="./docs/images/supervisormng.png" width="700" alt="pannello controllo supervisor">
+</p>
 
 ### 9.4 Ruolo: SUPER SUPERVISOR (Livello Strategico/Audit)
-Il vertice della catena di comando con permessi di governance.
+Il vertice della catena di comando con permessi di governance, UI PURPLE.
 * **Audit Globale:** Visualizza l'elenco completo di **tutte le missioni** nel sistema, indipendentemente dal livello di segretezza o dall'assegnazione.
-* **Gestione Clearance (NOS):** Accede al pannello di amministrazione per elevare o revocare il livello di sicurezza (0-3) degli altri utenti.
-* **Intervento d'Emergenza:** Può forzare la chiusura ("Abortita") di qualsiasi missione in corso per motivi di sicurezza nazionale.
-* **Accesso Anagrafica Completa:** Visualizza l'identità reale di qualsiasi *Code Name* presente nel sistema.
+* **Gestione Clearance (NOS):** Accede al database di **tutti gli utenti**: agenti e supervisor, può elevare o revocare il livello di sicurezza (0-3).
+* **Intervento d'Emergenza:** Può forzare la chiusura ("Abortita") di qualsiasi missione in corso per motivi di sicurezza o cambiarne lo stato.
+* **Accesso Anagrafica Completa:** Visualizza l'identità reale di qualsiasi *Code Name* presente nel sistema visionando il suo dossier.
 
 ---
 
@@ -309,7 +362,7 @@ Questa sezione documenta i tentativi deliberati di violare i vincoli di sicurezz
 
 **Prerequisiti:** Docker, Java 21, Node.js 20+.
 
-### 1. Avvio Infrastruttura
+### 11.1. Avvio Infrastruttura
 Lanciare i servizi di supporto (DB, Keycloak, Vault).
 
 ```bash
@@ -318,7 +371,7 @@ docker-compose up -d
 # Attendere l'inizializzazione dei container.
 ```
 
-### 2. Configurazione Backend
+### 11.2. Configurazione Backend
 Il backend attende che Vault e DB siano pronti.
 
 ```bash
@@ -327,7 +380,7 @@ mvn spring-boot:run
 ```
 *Il server si avvierà sulla porta **8443** (HTTPS).*
 
-### 3. Avvio Frontend
+### 11.3. Avvio Frontend
 
 ```bash
 cd aegis-frontend
@@ -343,6 +396,19 @@ Nota: Essendo un ambiente locale con certificati auto-firmati (certs/), sarà ne
 > * `WINDOWS_SETUP.md`
 > * `MAC_SETUP.md`
 > * `LINUX_SETUP.md`
+
+### 11.5 Credenziali di Default (Ambiente di Sviluppo)
+
+> ⚠️ **ATTENZIONE - NOTA DI SICUREZZA**
+> Le seguenti credenziali sono configurate **esclusivamente per l'ambiente di test locale**. Sono volutamente semplificate e deboli per facilitare la valutazione e il testing del sistema.
+> In qualsiasi scenario di deployment reale o produzione, è **obbligatorio** modificare immediatamente queste password e ruotare i token amministrativi.
+
+| Servizio | URL Console | Metodo Accesso | Credenziali |
+| :--- | :--- | :--- | :--- |
+| **Keycloak** (IAM) | `https://localhost:8444` | Basic Auth | **Username:** `admin`<br>**Password:** `admin` |
+| **HashiCorp Vault** | `http://localhost:8200` | Token Auth | **Root Token:** `root_token_segreto` |
+
+---
 
 ## 12. Riferimenti Normativi e Teorici
 
