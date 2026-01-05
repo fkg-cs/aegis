@@ -370,7 +370,7 @@ Questa sezione documenta i tentativi deliberati più comuni per violare i vincol
 * **Risultato:**
     * **PATCH (Status):** Riceve **403 Forbidden**. Il Security Layer (`@PreAuthorize`) invoca `canAccessMission`, che verifica la relazione nel database: non essendo l'attaccante né l'**Owner** né un operatore **Assegnato**, l'accesso è negato.
     * **PUT (Dettagli):** Riceve **405 Method Not Allowed**. L'API è progettata per non esporre endpoint di modifica massiva, riducendo la superficie d'attacco strutturale.
-* **Risultato:** Il sistema risponde con **403 Forbidden**. Il Security Filter verifica che l'utente non sia né l'owner né un partecipante autorizzato.
+* **Risultato complessivo:** Il sistema risponde con **403 Forbidden**. Il Security Filter verifica che l'utente non sia né l'owner né un partecipante autorizzato.
 
 
 ### 10.3 Injection nella Chat (XSS/Scripting)
@@ -388,7 +388,13 @@ Questa sezione documenta i tentativi deliberati più comuni per violare i vincol
   ```bash
   curl -k -I https://localhost:8443/api/intel/missions
   ```
-
+* **Risultato:** Il server risponde istantaneamente con **401 Unauthorized**.
+* **Analisi Tecnica:** Il backend è configurato come **OAuth2 Resource Server** stateless. La richiesta viene intercettata dal `SecurityFilterChain` di Spring Boot *prima* di raggiungere qualsiasi Controller Java. Il filtro esegue tre validazioni sequenziali bloccanti:
+    1. **Header Check:** Verifica la presenza dell'header `Authorization: Bearer <token>`.
+    2. **Crypto Validation:** Se il token è presente, il server scarica la chiave pubblica (JWK) da Keycloak e valida matematicamente la firma digitale.
+    3. **Expiration Check:** Verifica che il token non sia scaduto (claim `exp`).
+    
+    In assenza di un token valido emesso dall'Identity Provider istituzionale, l'API rimane completamente inaccessibile e invisibile.
 ---
 
 ## 11. Guida all'Installazione 
