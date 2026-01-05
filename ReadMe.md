@@ -351,25 +351,48 @@ Il vertice della catena di comando con permessi di governance, UI PURPLE.
 ---
 
 ## 10. Test d'Abuso (Security Stress Test)
-Questa sezione documenta i tentativi deliberati di violare i vincoli di sicurezza ("Negative Testing") per dimostrare la resilienza dell'architettura Zero Trust.
+Questa sezione documenta i tentativi deliberati più comuni per violare i vincoli di sicurezza ("Negative Testing") dimostrando la resilienza dell'architettura Zero Trust.
 
 ### 10.1 Violazione della Gerarchia (No Read Up)
-* **Azione:** Un `Agente` (Livello 1) tenta di accedere a una missione di Livello 2 inserendo l'UUID corretto nella barra degli indirizzi.
-* **Risultato:** Il sistema risponde con **403 Forbidden**. Il controllo accessi (Bell-LaPadula) blocca la richiesta a livello di Backend prima di interrogare il database.
+* **Scenario:** Un `Agente` (Livello 1) tenta di accedere tramite URL diretto (UUID) a una missione di Livello 2 a cui non è assegnato.
+* **Azione:** `GET /api/intel/missions/{UUID-SEGRETO}` o tramite searchbar dell'UI.
+* **Risultato:** Il sistema risponde con **403 Forbidden**. L'architettura applica una **doppia barriera di sicurezza** (*Defense in Depth*) nel Service Layer:
+    1.  **Need-to-Know:** Il sistema verifica primariamente l'assegnazione. Non essendo l'agente nella lista autorizzata, la richiesta viene bloccata immediatamente.
+    2.  **Bell-LaPadula:** Anche nell'ipotesi di un'assegnazione errata, scatterebbe il controllo gerarchico (*No Read Up*), bloccando l'accesso per clearance insufficiente.
+    *Nota:* Il database viene interrogato esclusivamente per recuperare i metadati di controllo; nessun dato sensibile viene serializzato verso il client.
+  <p align="center">
+  <img src="./docs/images/abuse1.png" width="700" alt="screen test abuso 1">
+</p>
 
-### 10.2 Privilege Escalation Orizzontale (IDOR)
-* **Azione:** Un `Supervisor` prova a modificare i dettagli di una missione creata da un collega (di cui non fa parte) manipolando l'ID nella chiamata API `PUT /api/missions/{UUID}`.
+### 10.2 Privilege Escalation Orizzontale (BOLA/IDOR)
+* **Scenario:** Un `Supervisor` ("Attaccante") tenta di manipolare una missione gestita da un collega ("Vittima") senza averne titolo.
+* **Azione:** L'attaccante recupera l'UUID della missione target e invia una richiesta `PATCH /api/intel/missions/{UUID}/status` per forzarne la chiusura, oppure una `PUT` per modificarne i dettagli.
+* **Risultato:**
+    * **PATCH (Status):** Riceve **403 Forbidden**. Il Security Layer (`@PreAuthorize`) invoca `canAccessMission`, che verifica la relazione nel database: non essendo l'attaccante né l'**Owner** né un operatore **Assegnato**, l'accesso è negato.
+    * **PUT (Dettagli):** Riceve **405 Method Not Allowed**. L'API è progettata per non esporre endpoint di modifica massiva, riducendo la superficie d'attacco strutturale.
 * **Risultato:** Il sistema risponde con **403 Forbidden**. Il Security Filter verifica che l'utente non sia né l'owner né un partecipante autorizzato.
+<p align="center">
+  <img src="./docs/images/abuse4.png" width="700" alt="screen test abuso 2">
+</p>
 
 ### 10.3 Injection nella Chat (XSS/Scripting)
-* **Azione:** Un operatore invia nella chat criptata un payload malevolo: `<script>alert('HACKED')</script>` o un link esterno `http://malware.site`.
-* **Risultato:**
-    * **XSS:** Il messaggio viene sanificato; il codice non viene eseguito nel browser degli altri partecipanti.
-    * **Link:** Il validatore input rifiuta il messaggio o rimuove il collegamento ipertestuale, impedendo rischi di phishing.
+* **Azione:** Un operatore tenta di inviare nella chat un payload malevolo (`<script>alert('HACKED')</script>`) o un link di phishing (`http://malware.site`).
+* **Risultato:** Il sistema neutralizza la minaccia applicando una difesa a due livelli (*Defense in Depth*):
+    * **Link (Backend Side):** Il `MissionService` applica un controllo rigoroso tramite **Regex**. Se viene rilevato un pattern URL, la richiesta viene **respinta** con un'eccezione di sicurezza (`SecurityException`), impedendo che il dato venga salvato nel database.
+    * **XSS (Frontend Side):** L'input viene sanificato in tempo reale rimuovendo i caratteri critici (`<`, `>`). Il payload viene convertito in semplice testo inerte (es. `script...`), rendendo tecnicamente impossibile l'esecuzione del codice nel browser degli altri partecipanti.
+<p align="center">
+  <img src="./docs/images/abuse3.png" width="700" alt="screen test abuso 3">
+</p>
 
 ### 10.4 Bypass dell'Autenticazione (Direct API Access)
-* **Azione:** Un attaccante tenta di invocare le API di Backend (es. `https://localhost:8443/api/missions`) usando `curl` o Postman senza passare dal Frontend e senza Header Authorization.
-* **Risultato:** Il sistema risponde con **401 Unauthorized**. Le API non sono esposte pubblicamente e richiedono un Bearer Token JWT valido e firmato da Keycloak.
+* **Scenario:** Un attaccante tenta di aggirare l'interfaccia utente invocando direttamente le API di Backend tramite terminale o script, senza fornire credenziali valide.
+* **Azione:** Esecuzione di una chiamata cruda verso un endpoint protetto:
+  ```bash
+  curl -k -I https://localhost:8443/api/intel/missions
+  ```
+<p align="center">
+  <img src="./docs/images/abuse4.png" width="700" alt="screen test abuso 4">
+</p>
 
 ---
 
