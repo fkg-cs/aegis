@@ -371,9 +371,7 @@ Questa sezione documenta i tentativi deliberati più comuni per violare i vincol
     * **PATCH (Status):** Riceve **403 Forbidden**. Il Security Layer (`@PreAuthorize`) invoca `canAccessMission`, che verifica la relazione nel database: non essendo l'attaccante né l'**Owner** né un operatore **Assegnato**, l'accesso è negato.
     * **PUT (Dettagli):** Riceve **405 Method Not Allowed**. L'API è progettata per non esporre endpoint di modifica massiva, riducendo la superficie d'attacco strutturale.
 * **Risultato:** Il sistema risponde con **403 Forbidden**. Il Security Filter verifica che l'utente non sia né l'owner né un partecipante autorizzato.
-<p align="center">
-  <img src="./docs/images/abuse4.png" width="700" alt="screen test abuso 2">
-</p>
+
 
 ### 10.3 Injection nella Chat (XSS/Scripting)
 * **Azione:** Un operatore tenta di inviare nella chat un payload malevolo (`<script>alert('HACKED')</script>`) o un link di phishing (`http://malware.site`).
@@ -390,9 +388,6 @@ Questa sezione documenta i tentativi deliberati più comuni per violare i vincol
   ```bash
   curl -k -I https://localhost:8443/api/intel/missions
   ```
-<p align="center">
-  <img src="./docs/images/abuse4.png" width="700" alt="screen test abuso 4">
-</p>
 
 ---
 
