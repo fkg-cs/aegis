@@ -91,7 +91,7 @@ Inoltre, i servizi infrastrutturali (Database, Vault) sono isolati in container 
 
 ---
 
-### 4.Matrice di Sicurezza 
+## 4.Matrice di Sicurezza 
 Aegis implementa una strategia di difesa a più livelli "Defense in Depth" per mitigare le minacce moderne, combinando controlli infrastrutturali, logici e crittografici.
 | Minaccia / Requisito | Implementazione Tecnica in AEGIS |
 | :--- | :--- |
@@ -436,7 +436,7 @@ Nota: Essendo un ambiente locale con certificati auto-firmati (certs/), sarà ne
 > * `MAC_SETUP.md`
 > * `LINUX_SETUP.md`
 
-### 11.5 Credenziali di Default (Ambiente di Sviluppo)
+### 11.4 Credenziali di Default (Ambiente di Sviluppo)
 
 > ⚠️ **ATTENZIONE - NOTA DI SICUREZZA**
 > Le seguenti credenziali sono configurate **esclusivamente per l'ambiente di test locale**. Sono volutamente semplificate e deboli per facilitare la valutazione e il testing del sistema.
