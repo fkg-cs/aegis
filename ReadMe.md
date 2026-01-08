@@ -253,15 +253,15 @@ L'interfaccia grafica (GUI) di Aegis adotta un tema **Dark Cyberpunk** moderno e
 Per garantire la **Situational Awareness** immediata e prevenire errori di contesto (es. credere di essere in un ruolo diverso), l'interfaccia di Aegis adatta dinamicamente il proprio schema cromatico (Theme) in base al profilo dell'utente loggato.
 Ogni colore è stato selezionato secondo precisi criteri semiotici per riflettere la natura del ruolo:
 
-* 🔵 **AGENT - Tactical Blue (Blu Operativo)**
+* 🔵 **AGENT - Tactical Blue**
     * **Significato:** Il blu evoca stabilità, fiducia e calma sotto pressione.
     * **Funzione:** Progettato per gli operatori sul campo che necessitano di chiarezza mentale e focus assoluto sull'esecuzione della missione, riducendo l'affaticamento visivo durante la lettura delle informazioni sensibili.
 
-* 🟠 **SUPERVISOR - Alert Orange (Arancio Tattico)**
+* 🟠 **SUPERVISOR - Alert Orange**
     * **Significato:** L'arancione rappresenta l'attenzione, l'energia e la vigilanza attiva.
     * **Funzione:** Evidenzia il ruolo di coordinamento. Mantiene il Supervisore in stato di allerta, facilitando l'identificazione rapida di anomalie, cambi di stato critici e la gestione dinamica delle risorse.
 
-* 🟣 **SUPER SUPERVISOR - Governance Purple (Viola Imperiale)**
+* 🟣 **SUPER SUPERVISOR - Governance Purple**
     * **Significato:** Il viola è storicamente associato all'autorità suprema, alla saggezza e al giudizio.
     * **Funzione:** Distingue nettamente il livello di Audit/Governance dalla catena operativa standard. Sottolinea il potere di intervento straordinario (es. abortire missioni, revocare NOS) e la visione onnisciente ("God Mode") sul sistema.
 ---
