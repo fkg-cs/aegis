@@ -59,7 +59,7 @@ Il sistema mappa i livelli numerici sulle quattro classifiche di segretezza uffi
 * **Livello 3 - SEGRETISSIMO (SS):**
     Livello apicale (*Top Secret*). Riservato a un ristretto numero di Supervisori e agenti per informazioni la cui rivelazione può causare un danno **eccezionalmente grave**, minacciando la sopravvivenza stessa delle istituzioni democratiche.
 
-### 2.2 Architettura dei Dati "Dual-Layer"
+### 2.2 Architettura dei Dati "Dual-Sight"
 Il progetto adotta una strategia di gestione dati a doppio livello per bilanciare la segretezza operativa (*Need-to-Know*) con il dovere di controllo democratico:
 
 1.  **Operatività In-House (Segreto di Stato):** I documenti classificati e i dossier di missione sono cifrati e residenti fisicamente sull'infrastruttura dell'Agenzia operativa, assicurando la totale ermeticità delle informazioni sensibili.
