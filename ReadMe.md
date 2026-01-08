@@ -77,8 +77,8 @@ Il Backend **non si fida implicitamente** del Frontend o della rete locale.
 Ogni singola richiesta HTTP verso le API viene intercettata dal `SecurityFilterChain` e validata crittograficamente. Se il token JWT non è valido, non è firmato correttamente da Keycloak o è scaduto, la richiesta viene respinta istantaneamente con `401 Unauthorized` o `403 Forbidden`, anche se proviene dall'interno della rete aziendale protetta.
 
 ### 3.2. Principio del Privilegio Minimo (Least Privilege)
-Abbiamo implementato l'accesso gerarchico rigoroso basato sul modello **Bell-LaPadula**:
-* **Controllo Puntuale:** Un utente con ruolo `AGENT` può vedere solo le missioni a lui assegnate; questo controllo è verificato a livello di codice nel `MissionController`.
+È stato implementato l'accesso gerarchico rigoroso basato sul modello **Bell-LaPadula**:
+* **Controllo Assegnazioni:** Un utente con ruolo `AGENT` può vedere solo le missioni a lui assegnate; questo controllo è verificato a livello di codice nel `MissionController`.
 * **Blocco Verticale:** Un utente con clearance "Livello 1" viene bloccato dal sistema se tenta di accedere a una missione "Livello 2", anche se è in possesso di un URL valido (prevenzione *Forced Browsing*).
 
 ### 3.3. Micro-Segmentazione e Identità
