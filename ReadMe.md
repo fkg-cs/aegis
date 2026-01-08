@@ -96,7 +96,7 @@ Aegis implementa una strategia di difesa a più livelli "Defense in Depth" per m
 | Minaccia / Requisito | Implementazione Tecnica in AEGIS |
 | :--- | :--- |
 | **Vulnerabilità Logiche**<br>(BOLA/BFLA) | **ACL Granulari**: Controlli `PreAuthorize` nel Business Layer per verificare ownership e clearance.<br>**Identificativi Non-Sequenziali**: Uso rigoroso di UUID per impedire l'enumerazione orizzontale. |
-| **Enumerazione Dati**<br>(IDOR) | **UUID Only**: Tutte le risorse (Missioni, Agenti) sono referenziate esclusivamente tramite UUID v4, rendendo impossibile "indovinare" gli ID delle risorse altrui. |
+| **Enumerazione Dati**<br> | **UUID Only**: Tutte le risorse (Missioni, Agenti) sono referenziate esclusivamente tramite UUID v4, rendendo impossibile "indovinare" gli ID delle risorse altrui. |
 | **Session Hijacking** | **Stateless**: Sessioni basate interamente su token JWT (JSON Web Token). Nessuna persistenza di sessione server-side vulnerabile a fixation. |
 | **Compromissione Credenziali** | **MFA Obbligatoria**: Keycloak configurato con TOTP (RFC 6238). L'accesso richiede password + codice OTP (Google/MS Authenticator).<br>**No Self-Registration**: Creazione utenze centralizzata. |
 | **Data Leakage (Files)** | **Encryption at Rest**: Tutti gli allegati sono cifrati con AES-128 su disco.<br>**Dynamic Watermarking**: Applicazione "al volo" di filigrane (es. "RISERVATO: [USER_ID]") sui PDF scaricati. |
@@ -229,7 +229,6 @@ Il sistema Aegis offre un set di funzionalità progettate per garantire la compa
 
 ### 8.2 Gestione Missioni (Supervisor)
 * **Creazione Vincolata:** I Supervisor possono creare missioni definendo zona geografica, descrizione, documento missione allegato e livello di sicurezza minimo richiesto.
-    * *Vincolo di Sicurezza:* È possibile creare missioni solo con livello di segretezza uguale o inferiore al proprio (es. un Supervisor Livello 2 non può creare una missione Livello 3).
 * **Gestione Operatori:** Assegnazione degli agenti tramite barra di ricerca.
     * *Vincolo di Assegnazione:* Il sistema permette di aggiungere solo utenti con clearance maggiore o uguale a quella della missione.
 * **Workflow:** Gestione del ciclo di vita della missione con stati definiti (In istruttoria, Standby, In corso, Abortita, Conclusa) e indicatori visivi.
